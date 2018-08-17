@@ -6,9 +6,7 @@ require(rasterVis)
 require(ENMeval)
 
 #Get data
-#ghanaplants<-read.table('S:\\Supervision\\Sarah\\0000564-171025204727650\\occurrence.txt',header=T,sep='\t')
-#Fread in datatable less problematic 
-ghanaplants<-fread('S:\\Supervision\\Sarah\\0000564-171025204727650\\occurrence.txt')
+ghanaplants<-fread('occurrence.txt')
 
 head(ghanaplants)
 summary(ghanaplants)
@@ -53,7 +51,7 @@ length(species_records[species_records>20])
 
 with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length))
 
-KML(ghana_species_pts_insidemap,'S:\\Supervision\\Sarah\\GBIFrecords')
+#KML(ghana_species_pts_insidemap,'KMLGBIFrecords')
 
 
 
