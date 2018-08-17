@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="e1e16cf0-ada2-11e2-8fbc-00145eb45e9a"  system="http://gbif.org" scope="system"
+  xml:lang="en">
+
+<dataset>
+      <alternateIdentifier>doi:10.15468/bvu6a8</alternateIdentifier>
+        <alternateIdentifier>14847</alternateIdentifier>
+    <title>Neptune Deep-Sea Microfossil Occurrence Database</title>
+    <associatedParty>
+    <address>
+<deliveryPoint>Museum für Naturkunde Berlin, Invalidenstraße 43, 10115 Berlin, Germany</deliveryPoint>    </address>
+<phone>049 30 2093 8672</phone><electronicMailAddress>gbif@mfn-berlin.de</electronicMailAddress>    <role>TECHNICAL_POINT_OF_CONTACT</role>
+    </associatedParty>
+    <language>en</language>
+    <abstract>
+        <para>Micropaleontologic study of deep-sea sediments cored over several decades by the DSDP, ODP and IODP drilling programs has yielded a vast body of information on the occurrences of individual fossil marine plankton species over time. This information also has been combined with other types of geochronologic information by interdisciplinary teams of scientists to construct detailed age estimates - age models - for hundreds of deep-sea drilling sections. Together, this information provides a uniquely detailed history of of biologic evolution in the oceans, as well as an important source of geochronologic information for geologic studies of ocean and climate change.    The Neptune database provides integrated access to this global data-set. It contains over 500,000 records for the occurrences of species in individual, numerically age-dated samples, age models for hundreds of deep-sea sections, and extensive, annotated, quality-controlled taxonomic lists for thousands of fossil marine plankton species. Neptune, or analyses from it, have been used in over 30 research papers (median ISI 3.5), including 8 in Science, Nature or PNAS.    Neptune was originally created by a team led by me in the early 1990s at the ETH in Zürich, and re-cast in internet form, with the addition of more data, by the Chronos project of NSF in the early 2000s. In response to the lapse of Chronos and support for Neptune, I teamed up with Patrick Diver, the main Chronos database programmer, to create a new version of Neptune (Neptune Sandbox Berlin, or NSB) that is hosted at the Museum für Naturkunde. Extensive reprogramming has streamlined the system so that it is easier to maintain, and includes support for direct programmable access over the internet for advanced research purposes. This project was supported by CEES, Oslo. NSB currently does not have a web-interface but one is planned to be added by early 2013.    NSB has already been used in published research within my own group, and to provide data on request to external scientists. Broader collaborations and renewed general public access via the web interface are planned for the future.</para>
+    </abstract>
+      <intellectualRights>
+        <para>This work is licensed under a <ulink url="http://creativecommons.org/licenses/by/4.0/legalcode"><citetitle>Creative Commons Attribution (CC-BY) 4.0 License</citetitle></ulink>.</para>
+      </intellectualRights>
+      <contact>
+    <address>
+<deliveryPoint>Museum für Naturkunde Berlin, Invalidenstraße 43, 10115 Berlin, Germany</deliveryPoint>    </address>
+<phone>030 2093 8579</phone><electronicMailAddress>david.lazarus@mfn-berlin.de</electronicMailAddress>      </contact>
+
+</dataset>
+
+<additionalMetadata>
+    <metadata>
+      <gbif>
+        <dateStamp>2017-10-26T11:14:25Z</dateStamp>
+      <citation>Museum für Naturkunde Berlin. Neptune Deep-Sea Microfossil Occurrence Database. Occurrence Dataset https://doi.org/10.15468/bvu6a8 accessed via GBIF.org on 2017-10-26.</citation>
+              <resourceLogoUrl>http://www.naturkundemuseum-berlin.de/fileadmin/templates/etc/css/../img/logo-mfn.gif</resourceLogoUrl>
+        </gbif>
+    </metadata>
+</additionalMetadata>
+
+</eml:eml>

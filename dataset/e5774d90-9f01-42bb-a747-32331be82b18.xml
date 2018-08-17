@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="e5774d90-9f01-42bb-a747-32331be82b18"  system="http://gbif.org" scope="system"
+  xml:lang="en">
+
+<dataset>
+      <alternateIdentifier>doi:10.15468/r9azth</alternateIdentifier>
+    <title>African Plants - a photo guide</title>
+    <associatedParty>
+    <address>
+<deliveryPoint>Senckenberg, Senckenberganlage 25, D-60325 Frankfurt am Main, Germany</deliveryPoint>    </address>
+<electronicMailAddress>sgn-datacenter@senckenberg.de</electronicMailAddress>    <role>TECHNICAL_POINT_OF_CONTACT</role>
+    </associatedParty>
+    <language>en</language>
+    <abstract>
+        <para>Photographic records of tropical African plants</para>
+    </abstract>
+      <intellectualRights>
+        <para>This work is licensed under a <ulink url="http://creativecommons.org/licenses/by/4.0/legalcode"><citetitle>Creative Commons Attribution (CC-BY) 4.0 License</citetitle></ulink>.</para>
+      </intellectualRights>
+      <distribution scope="document">
+          <online>
+              <url function="information">http://www.africanplants.senckenberg.de</url>
+          </online>
+      </distribution>
+      <contact>
+    <address>
+    </address>
+<electronicMailAddress>westafricanplants@senckenberg.de</electronicMailAddress>      </contact>
+
+</dataset>
+
+<additionalMetadata>
+    <metadata>
+      <gbif>
+        <dateStamp>2017-10-26T11:14:26Z</dateStamp>
+      <citation>Senckenberg. African Plants - a photo guide. Occurrence Dataset https://doi.org/10.15468/r9azth accessed via GBIF.org on 2017-10-26.</citation>
+              <resourceLogoUrl>http://biocase.senckenberg.de/Senckenberg_Logo.png</resourceLogoUrl>
+        </gbif>
+    </metadata>
+</additionalMetadata>
+
+</eml:eml>

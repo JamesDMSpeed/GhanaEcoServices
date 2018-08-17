@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="baa86fb2-7346-4507-a34f-44e4c1bd0d57"  system="http://gbif.org" scope="system"
+  xml:lang="fr">
+
+<dataset>
+      <alternateIdentifier>doi:10.15468/rydcn2</alternateIdentifier>
+        <alternateIdentifier>11503</alternateIdentifier>
+    <title>Carnet en Ligne</title>
+    <associatedParty>
+<positionName>system administrator</positionName><positionName>data administrator</positionName><phone>+334 67 52 41 22</phone><electronicMailAddress>webmestre@tela-botanica.org</electronicMailAddress>    </associatedParty>
+    <language>en</language>
+    <abstract>
+        <para>Données issues du programme de sciences participatives Flora Data. Des botanistes novices comme experts alimentent ce jeu de données en publiant leurs observations à travers le réseau Tela Botanica, à l&amp;#39;aide de l&amp;#39;outil Carnet en Ligne. Participez ! http://www.tela-botanica.org/page:flora_data</para>
+    </abstract>
+      <intellectualRights>
+        <para>This work is licensed under a <ulink url="http://creativecommons.org/licenses/by-nc/4.0/legalcode"><citetitle>Creative Commons Attribution Non Commercial (CC-BY-NC) 4.0 License</citetitle></ulink>.</para>
+      </intellectualRights>
+      <distribution scope="document">
+          <online>
+              <url function="information">http://api.tela-botanica.org/tapirlink/tapir.php/cel</url>
+          </online>
+      </distribution>
+
+</dataset>
+
+<additionalMetadata>
+    <metadata>
+      <gbif>
+        <dateStamp>2017-10-26T11:14:26Z</dateStamp>
+      <citation>Tela Botanica. Carnet en Ligne. Occurrence Dataset https://doi.org/10.15468/rydcn2 accessed via GBIF.org on 2017-10-26.</citation>
+        </gbif>
+    </metadata>
+</additionalMetadata>
+
+</eml:eml>

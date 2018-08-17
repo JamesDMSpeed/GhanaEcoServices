@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="97e31e98-b7db-485d-82ce-8fc7f3c37552"  system="http://gbif.org" scope="system"
+  xml:lang="en">
+
+<dataset>
+      <alternateIdentifier>doi:10.15468/l7b2zt</alternateIdentifier>
+        <alternateIdentifier>http://ipt.nlbif.nl/ipt/resource?r=herbariumghana</alternateIdentifier>
+        <alternateIdentifier>97e31e98-b7db-485d-82ce-8fc7f3c37552</alternateIdentifier>
+        <alternateIdentifier>14195</alternateIdentifier>
+    <title>University of Ghana - Ghana Herbarium</title>
+    <creator>
+    <individualName>
+<givenName>Alex</givenName>        <surName>Asase</surName>
+    </individualName>
+<organizationName>University of Ghana</organizationName><positionName>Node Manager GhaBIF</positionName>    <address>
+<deliveryPoint>P.O. Box LG 55</deliveryPoint><city>Legon</city><country>GHANA</country>    </address>
+<electronicMailAddress>aasase@ug.edu.gh</electronicMailAddress>    </creator>
+    <metadataProvider>
+    <individualName>
+<givenName>NLBIF</givenName>        <surName>data administrator</surName>
+    </individualName>
+<organizationName>NLBIF</organizationName>    <address>
+<deliveryPoint>P.O. Box 93102</deliveryPoint><city>Amsterdam</city><postalCode>NL-1090 BC</postalCode><country>NETHERLANDS</country>    </address>
+<phone>+31 20 5255496</phone><electronicMailAddress>ipt-administrator@nlbif.nl</electronicMailAddress><onlineUrl>http://www.nlbif.nl</onlineUrl>    </metadataProvider>
+    <associatedParty>
+    <individualName>
+<givenName>Cees</givenName>        <surName>Hof</surName>
+    </individualName>
+<organizationName>NLBIF</organizationName><positionName>Node Manager</positionName>    <address>
+<deliveryPoint>P.O. Box 93102</deliveryPoint><city>Amsterdam</city><postalCode>NL-1090 BC</postalCode><country>NETHERLANDS</country>    </address>
+<phone>+31 20 5255496</phone><electronicMailAddress>ipt-administrator@nlbif.nl</electronicMailAddress><onlineUrl>http://www.nlbif.nl</onlineUrl>    <role>PUBLISHER</role>
+    </associatedParty>
+      <pubDate>
+      2015-07-08
+      </pubDate>
+    <language>ENGLISH</language>
+    <abstract>
+        <para>The Ghana Herbarium of the University of Ghana dataset contains over 85,000 records documenting herbarium sheets and their biodiversity information. 55% of the records are georeferenced by latitude and longitude. About 75% of the records deal with specimen found in Ghana. The collection also includes several type specimens.
+Many sub-collections are accommodated in this collection, assembled by an international suit of collectors such as A.A. Enti, C.D. Adams, C.W. Agyakwah, D.M. John, F.R. Irvine, G.K. Akpabla, G.W. Lawson, J.B. Hall, J. Jenik, J.K. Morton, J.M. Lock, M. Hossain and R. Rose-Inns.</para>
+    </abstract>
+        <keywordSet>
+              <keyword>Herbarium</keyword>
+              <keyword>Types</keyword>
+              <keyword>University</keyword>
+              <keyword>West Africa</keyword>
+              <keyword>Department of Botany</keyword>
+              <keyword>Ghana</keyword>
+              <keywordThesaurus>n/a</keywordThesaurus>
+        </keywordSet>
+        <keywordSet>
+              <keyword>Occurrence</keyword>
+              <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+        </keywordSet>
+        <keywordSet>
+              <keyword>Specimen</keyword>
+              <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+        </keywordSet>
+      <additionalInfo>
+          <para>The Ghana Herbarium is a centre of taxonomic research in Ghana and also provides services such as the identification and collection of plant materials for institutions and individuals. The herbarium&apos;s activities are guided by certain Ghanaian national strategies related to biodiversity management, the Convention on Biological Diversity (CBD), and Convention on International Trade in Endangered Species (CITES).</para>
+      </additionalInfo>
+      <intellectualRights>
+        <para>This work is licensed under a <ulink url="http://creativecommons.org/licenses/by/4.0/legalcode"><citetitle>Creative Commons Attribution (CC-BY) 4.0 License</citetitle></ulink>.</para>
+      </intellectualRights>
+      <distribution scope="document">
+          <online>
+              <url function="information">http://ghabif.org/</url>
+          </online>
+      </distribution>
+      <coverage>
+            <geographicCoverage>
+                  <geographicDescription>Ghana and surrounding Western African territories</geographicDescription>
+                  <boundingCoordinates>
+                      <westBoundingCoordinate>-3.76</westBoundingCoordinate>
+                      <eastBoundingCoordinate>1.5</eastBoundingCoordinate>
+                      <northBoundingCoordinate>12.16</northBoundingCoordinate>
+                      <southBoundingCoordinate>4.54</southBoundingCoordinate>
+                  </boundingCoordinates>
+            </geographicCoverage>
+          <temporalCoverage>
+            <rangeOfDates>
+              <beginDate>
+                <calendarDate>      1898-01-01
+</calendarDate>
+              </beginDate>
+              <endDate>
+                <calendarDate>      2012-01-01
+</calendarDate>
+              </endDate>
+            </rangeOfDates>
+          </temporalCoverage>
+              <taxonomicCoverage>
+                    <taxonomicClassification>
+                          <taxonRankName>Kingdom</taxonRankName>
+                        <taxonRankValue>Plantae</taxonRankValue>
+                          <commonName>Plants</commonName>
+                    </taxonomicClassification>
+              </taxonomicCoverage>
+      </coverage>
+      <purpose>
+          <para>Teaching and research support</para>
+      </purpose>
+      <contact>
+    <individualName>
+<givenName>Alex</givenName>        <surName>Asase</surName>
+    </individualName>
+<organizationName>University of Ghana</organizationName><positionName>Node Manager GhaBIF</positionName>    <address>
+<deliveryPoint>P.O. Box LG 55</deliveryPoint><city>Legon</city><country>GHANA</country>    </address>
+<electronicMailAddress>aasase@ug.edu.gh</electronicMailAddress>      </contact>
+
+</dataset>
+
+<additionalMetadata>
+    <metadata>
+      <gbif>
+        <dateStamp>2017-10-26T11:14:27Z</dateStamp>
+      <citation>Asase A, data administrator N (2015). University of Ghana - Ghana Herbarium. Version 8.2. Ghana Biodiversity Information Facility (GhaBIF). Occurrence Dataset https://doi.org/10.15468/l7b2zt accessed via GBIF.org on 2017-10-26.</citation>
+              <resourceLogoUrl>http://ts-den.aluka.org/fsi/img/misc/partner_img/Aluka_Logos/ghana_gc_logo.gif</resourceLogoUrl>
+              <collection>
+                <parentCollectionIdentifier>n/a</parentCollectionIdentifier>
+                <collectionIdentifier>n/a</collectionIdentifier>
+                <collectionName>n/a</collectionName>
+              </collection>
+                <specimenPreservationMethod>DRIED</specimenPreservationMethod>
+        </gbif>
+    </metadata>
+</additionalMetadata>
+
+</eml:eml>
