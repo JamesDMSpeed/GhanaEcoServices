@@ -90,10 +90,13 @@ pairs(ghana1[[c(4,7,12,13,16,17,19)]])
 #Use Bio4 and BIo16 (Temp seasonality and precipitation of wettest quarter)
 
 #Landcover data
-lc1975<-raster('S:\\Supervision\\Sarah\\Landcover maps\\west_africa_land-use_land-cover_1975_2km\\swa_1975lulc_2km.tif')
+lc1975<-raster('Landcover maps/west_africa_land-use_land-cover_1975_2km/swa_1975lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc1975))
 ghanalc1975<-mask(crop(lc1975,ghanat),ghanat)
 plot(ghanalc1975)
+#NB legend is in RAT table
+levels(ghanalc1975)
+#Do the same with other years too
 
 #Choose a species #Pterocarpus erinaceus
 pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pterocarpus erinaceus',]
