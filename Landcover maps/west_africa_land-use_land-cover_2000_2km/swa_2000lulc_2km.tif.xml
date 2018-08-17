@@ -1,0 +1,740 @@
+﻿<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>G. Gray Tappan</origin>
+        <origin>W. Matthew Cushing</origin>
+		<origin>Suzanne E. Cotillon</origin>
+		<origin>Melissa L. Mathis</origin> 
+        <origin>John A. Hutchinson</origin>
+        <origin>South Dakota State University, Kevin J. Dalsted </origin>
+        <origin>Stefanie Herrmann</origin>
+        <origin>Adam Case</origin>
+		<origin>Eric Wood (Data reviewer)</origin>
+		<origin>Lindsey Harriman (Data reviewer)</origin>
+        <pubdate>20161109</pubdate>
+        <title>West Africa Land Use Land Cover Time Series (2000)</title>
+        <edition>First</edition>
+        <geoform>raster digital data</geoform>
+        <serinfo>
+          <sername>West Africa Land Use Land Cover Time Series</sername>
+          <issue>2016</issue>
+        </serinfo>
+        <pubinfo>
+          <pubplace>Reston, VA</pubplace>
+          <publish>U.S. Geological Survey</publish>
+        </pubinfo>
+        <othercit>Recommended Citation:
+Tappan, G. G., Cushing, W.M., Cotillon, S.E., Mathis, M.L., Hutchinson, J.A., and Dalsted, K.J. 2016 West Africa Land Use Land Cover Time Series: U.S. Geological Survey data release, http://dx.doi.org/10.5066/F73N21JF</othercit>
+        <onlink>http://dx.doi.org/10.5066/F73N21JF</onlink>
+        <onlink>http://eros.usgs.gov/westafrica</onlink>
+        <lworkcit>
+          <citeinfo>
+			<origin>G. Gray Tappan</origin>
+			<origin>W. Matthew Cushing</origin>
+			<origin>Suzanne E. Cotillon</origin>
+			<origin>John A. Hutchinson</origin>
+			<origin>Stefanie Herrmann</origin>
+            <pubdate>20161201</pubdate>
+            <title>Landscapes of West Africa—A window on a changing world</title>
+            <geoform>Portable Document Format (PDF)</geoform>
+            <pubinfo>
+              <pubplace>Garretson, S. Dakota USA</pubplace>
+              <publish>U.S. Geological Survey, Earth Resources Observation and Science (EROS) Center</publish>
+            </pubinfo>
+            <onlink>http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/wafrica/downloads/documents/Landscapes_of_West_Africa_Atlas_high_resolution_en.pdf</onlink>
+          </citeinfo>
+        </lworkcit>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>This series of three-period land use land cover (LULC) datasets (1975, 2000, and 2013) aids in monitoring change in West Africa’s land resources (exception is Tchad at 4 kilometers). To monitor and map these changes, a 26 general LULC class system was used. The classification system that was developed was primarily inspired by the “Yangambi Classification” (Trochain, 1957). This fairly broad class system for LULC was used because the classes can be readily identified on Landsat satellite imagery. A visual photo-interpretation approach was used to identify and map the LULC classes represented on Landsat images. The Rapid Land Cover Mapper (RLCM) was used to facilitate the photo-interpretation using Esri’s ArcGIS Desktop ArcMap software. Citation: Trochain, J.-L., 1957, Accord interafricain sur la définition des types de végétation de l’Afrique tropicale: Institut d’études centrafricaines.</abstract>
+      <purpose>The West Africa Land Use Dynamics Project provides AGRHYMET and its 17 participating countries a comprehensive two-kilometer (2-km) resolution land use land cover (LULC) dataset of the region for three time periods; 1975, 2000, and 2013. Hundreds of Landsat images were visually interpreted to develop a 2-km LULC dataset for each of the three time periods. To assist in validating the interpretations, thousands of aerial photographs and high-resolution satellite images were used. From the initial datasets produced by national teams, the U.S. Geological Survey (USGS) conducted an independent, detailed review of the interpretations. In concurrence with the respective country teams, the data have been revised to produce an accurate and consistent LULC assessment from within the countries and respective transboundary areas. This West Africa Land Use Dynamics Project represents an effort to document and quantify the impacts of change in both time and space, of the environmental and land resource trends across West Africa. The project was carried out through the AGRHYMET Regional Center in Niamey, Niger, in partners from 17 participating countries, the Sahel Institute (INSAH), the USGS Earth Resources Observation and Science (EROS), and with major support from the U.S. Agency for International Development (USAID) West Africa Regional Program. The overarching goal of the West Africa Land Use Dynamics Project is to promote the awareness of the trends and use of spatial information about natural resource trends among national and regional decision-makers. For a complete description of project visit https://eros.usgs.gov/westafrica</purpose>
+      <supplinf>On behalf of the governments and the people of West Africa who have benefitted from the West Africa Land Use Dynamics Project, the Comité Permanent Inter- Etats de Lutte contre la Sécheresse au Sahel (CILSS – Permanent Interstate Committee for Drought Control in the Sahel) expresses its profound gratitude to all those who have contributed to the publication of this atlas. In particular, we would like to thank: The West Africa Regional Office of the U.S. Agency for International Development (USAID) which financed, encouraged and contributed actively to the review of this atlas; The U.S. Geological Survey (USGS) Earth Resources Observation and Science (EROS) Center for the scientific and technical guidance, provision of satellite imagery, maps, field data and photographs, statistics and analyses; The AGRHYMET Regional Center under CILSS for its role in the technical coordination of the work and processing of satellite imagery; The Directors of the Centre National de Télédétection et de Suivi Ecologique (CENATEL) in Cotonou, the Agence Nationale de Gestion de l’Environnement (ANGE) in Lomé, and the Centre de Suivi Ecologique (CSE) in Dakar who hosted mapping validation workshops; The national teams from across West Africa who provided valuable content for the maps and case studies. Members of the National Teams Benin Cocou Pascal Akpassonou, Chef Division Coopération Technique au Centre National de Télédétection du Bénin (CENATEL); O. Félix Houeto, Chef Division Télédétection et SIG au Centre National de Télédétection (CENATEL) du Bénin. Burkina Faso Raïnatou Kabré, Chargé de production et de diffusion de l’information environnementale au Secrétariat Permanent du Conseil National pour l’Environnement et le Développement Durable (CONEDD) ; Louis Blanc Traoré, Directeur Monitoring de l’Environnement au Secrétariat Permanent du Conseil National pour l’Environnement et le Développement Durable (CONEDD). Cabo Verde Maria Da Cruz Gomes Soares, Directrice, Direction des Services de Sylviculture (DGASP); Sanchez Vaz Moreno Conceiçao, Responsable Inventaires Forestiers et Cartographie, Direction des Services de Sylviculture (DGASP). The Gambia Peter Gibba, Senior Meteorologist, Department Of Water Resources (DWR); Awa Kaira Agi, Program Officer CGIS UNIT, National Environment Agency (NEA). Ghana Emmanuel Tachie-Obeng, Environmental Protection Agency (EPA); Emmanuel Attua Morgan, Lecturer, Department of Geography and Resource Development, University of Ghana. Guinea Aïssatou Taran Diallo, Agro-environnementaliste, Ministère de l’Agriculture, Service National des Sols (SENASOL) ; Seny Soumah, Ingénieur Agrométéorologiste et Chef de Section, Direction Nationale de la Météorologie (CMN). Guinea-Bissau Antonio Pansau N’Dafa, Responsable Bases de Données Changements Climatiques, Secrétariat de l’Environnement Durable; Luis Mendes Cherno, Chargé de Bases de Données Climatiques, Institut National de Météorologie. Liberia D. Anthony Kpadeh, Head of Agro-meteorology, Climatology and Climate Change Adaptation, Liberia Hydrological Services; Torwon Tony Yantay, GIS Manager, Forestry Development Authority (FDA). Mali Abdou Ballo, Enseignant Chercheur, Faculté d’Histoire- Géographie, Université de Bamako; Zeinab Sidibe Keita, Ingénieur des Eaux Forêts, Système d’Information Forestier (SIFOR). Niger Nouhou Abdou, Chef Division Inventaires forestiers et Cartographie, Direction des Aménagements Forestiers et Restauration des terres, Ministère de l’Environnement, de la Salubrité Urbaine, et du Développement Durable; Abdou Roro, Chef du Département Cartographie, Institut Géographique National du Niger (IGNN). Nigeria Kayode Adewale Adepoju, Lecturer and Scientist, Obafemi Awolowo University, Ile Ife; Esther Oluwafunmilayo Omodanisi, Lecturer, Obafemi Awolowo University, Ile Ife; Sule Isaiah, Lecturer, Federal University of Technology, Minna; Mary Oluwatobi Odekunle, Federal University of Technology, Minna. Senegal Samba Laobé Ndao, Cartographe et Ingénieur en Aménagement du Territoire, Direction des Eaux, Forêts, Chasse, et de la Conservation des Sols (DEFCCS), Programme PROGEDE; Ousmane Bocoum, Cartographe, Centre de Suivi Écologique (CSE). Sierra Leone Samuel Dominic Johnson, System Administrator, Ministry of Agriculture, Forestry and Food Security (MAFFS). Chad Angeline Noubagombé Kemsol, Agronome, Assistante de Recherche, Centre National d’Appui à la Recherche (CNAR); Ouya Bondoro, Chercheur, Centre National d’Appui à la Recherche (CNAR). Togo Issa Abdou-Kérim Bindaoudou, Géographe et Cartographe, Direction Générale de la Statistique et de la Comptabilité Nationale; Yendouhame John Kombaté, Responsable Suivi Evaluation et Communication, Agence Nationale de Gestion de l’Environnement, Ministère de l’Environnement. Contributors from the AGRHYMET Regional Center Bako Mamane, Expert en télédétection et Système d’Information Géographique (SIG); Djibo Soumana, Expert Agrométéorologue; Alio Agoumo, Technicien en traitement d’images; Dan Karami, Technicien en Système d’Information Géographique.</supplinf>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>20100101</begdate>
+          <enddate>20131231</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>ground condition</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>Irregular</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-25.414459</westbc>
+        <eastbc>24.245739</eastbc>
+        <northbc>18.883107</northbc>
+        <southbc>3.264997</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>land use land cover</themekt>
+        <themekey>land use</themekey>
+        <themekey>land cover</themekey>
+        <themekey>land use classes</themekey>
+      </theme>
+      <theme>
+        <themekt>ISO 19115 Topic Categories</themekt>
+        <themekey>environment</themekey>
+      </theme>
+      <theme>
+        <themekt>ISO 19115 Topic Categories</themekt>
+        <themekey>environment</themekey>
+      </theme>
+      <place>
+        <placekt>West Africa</placekt>
+        <placekey>Benin</placekey>
+        <placekey>Guinea-Bissau</placekey>
+        <placekey>Burkina Faso</placekey>
+        <placekey>Mauritania</placekey>
+        <placekey>Nigeria</placekey>
+        <placekey>Senegal</placekey>
+        <placekey>Sierra Leone</placekey>
+        <placekey>Côte d'Ivoire</placekey>
+        <placekey>Gambia</placekey>
+        <placekey>Mali</placekey>
+        <placekey>Togo</placekey>
+        <placekey>Niger</placekey>
+        <placekey>Chad</placekey>
+        <placekey>Liberia</placekey>
+        <placekey>Ghana</placekey>
+        <placekey>Guinea</placekey>
+      </place>
+      <stratum>
+        <stratkt>ground surface</stratkt>
+        <stratkey>land use</stratkey>
+        <stratkey>land cover</stratkey>
+      </stratum>
+      <temporal>
+        <tempkt>Dry season</tempkt>
+        <tempkey>Cenozoic</tempkey>
+        <tempkey>Phanerozoic</tempkey>
+        <tempkey>Holocene</tempkey>
+      </temporal>
+    </keywords>
+    <accconst>None</accconst>
+    <useconst>Although these data have been used by the U.S. Geological Survey, U.S. Department of the Interior, no warranty expressed or implied is made by the U.S. Geological Survey as to the accuracy of the data. The act of distribution shall not constitute any such warranty, and no responsibility is assumed by the U.S. Geological Survey in the use of these data, software, or related materials. The use of firm, trade, or brand names in this report is for identification purposes only and does not constitute endorsement by the U.S. Geological Survey. The names mentioned in this document may be trademarks or registered trademarks of their respective trademark owners.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>Wm Matthew Cushing</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>South Dakota</state>
+          <postal>57198</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>605 594-2766</cntvoice>
+        <cntemail>mcushing@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>United States Agency for International Development (USAID), U.S. Geological Survey (USGS), Comité Permanent Inter-Etats de Lutte contre la Sécheresse dans le Sahel (CILSS)</datacred>
+    <native>Microsoft Windows 7 Version 6.1 (Build 7601) Service Pack 1; Esri ArcGIS 10.4.1.5686</native>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>No formal attribute accuracy tests were conducted</attraccr>
+    </attracc>
+    <logic>No formal logical accuracy tests were conducted</logic>
+    <complete>Land use land cover assessed at the center location of the two kilometer by two kilometer area.</complete>
+    <posacc>
+      <horizpa>
+        <horizpar>No formal positional accuracy tests were conducted</horizpar>
+      </horizpa>
+      <vertacc>
+        <vertaccr>No formal positional accuracy tests were conducted</vertaccr>
+      </vertacc>
+    </posacc>
+    <lineage>
+      <srcinfo>
+        <srccite>
+          <citeinfo>
+            <origin>U.S. Geological Survey</origin>
+            <pubdate>20160901</pubdate>
+            <title>Landsat Imagery</title>
+            <geoform>digital raster file</geoform>
+            <pubinfo>
+              <pubplace>Garretson, SD USA</pubplace>
+              <publish>U.S. Geological Survey</publish>
+            </pubinfo>
+            <onlink>http://landsat.usgs.gov/index.php</onlink>
+          </citeinfo>
+        </srccite>
+        <typesrc>satellite</typesrc>
+        <srctime>
+          <timeinfo>
+            <rngdates>
+              <begdate>19751001</begdate>
+              <enddate>20131231</enddate>
+            </rngdates>
+          </timeinfo>
+          <srccurr>Series includes land use land cover (LULC) from the time periods; 1975, 2000, and 2013 for the region of sub saharan West Africa from Senegal east to Tchad.</srccurr>
+        </srctime>
+        <srccitea>Landsat Imagery courtesy of the U.S. Geological Survey</srccitea>
+        <srccontr>Landsat Multispectral Scanner (MSS),Landsat Thematic Mapper (TM), Landsat Enhanced Thematic Mapper (ETM), Landsat Operational Land Imager (OLI).</srccontr>
+      </srcinfo>
+      <procstep>
+        <procdesc>USGS EROS scientists developed a tool called the Rapid Land Cover Mapper (RLCM). It is a vector-raster hybrid approach that lends itself to time-series Land Use Land Cover (LULC) mapping. It is conceptually based on the traditional dot grid method for calculating areas that have been employed by foresters and other users of imagery. The tool first generates a digital dot grid for a given study area. Then it overlays that dot grid on an image within Esri's ArcMap Desktop software. Using standard photo-interpretation skills, the analyst identifies the discrete LULC class for each dot and labels it according to the appropriate LULC class. The RLCM tool facilitates both the selection and attribution of dots for common LULC class. It also facilitates the management of multiple time period classifications for the study area. Once the dot grid classification is completed for one time period, a raster LULC dataset can be generated. The same process is applied to prior time periods and the resulting maps can be compared to assess change over time. For most countries, the country teams used 2 kilometer (km) spacing, which produces a 2 km resolution raster dataset with the exception of Chad. Because of Chad’s size and resource constraints the project chose to sample Chad a 4 km. In the final data set Chad’s 4 km pixels were subsampled to 2 km. The analyst first completes the point attribution for each Landsat image covering the country, usually starting with the most recent period, in this case, 2013. Each point is considered the center of a pixel. The attributed points (color-coded by LULC class) are then superimposed on co-registered images from an earlier time (e.g., Landsat Thematic Mapper from 1985). Each point is re-evaluated to determine if its attribution should remain the same or be reclassified because of change in land use or land cover. The completed set of points represents a dense, systematic sample of LULC classes for the additional period. The approach was repeated for 1975 time period using Landsat Multispectral Scanner (MSS) imagery from 1972 through 1978 (Note: due to limited Landsat MSS scene acquisitions, there is substantial cloud cover over Ghana and Cote d'Ivoire symbolize by pixel values of 98/99). The final step is to convert the grid of points to a raster format for analysis.</procdesc>
+        <procdate>20160801</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <spdoinfo>
+    <indspref>West Africa, Sahel</indspref>
+    <direct>Raster</direct>
+    <rastinfo>
+      <rasttype>Grid Cell</rasttype>
+      <rowcount>807</rowcount>
+      <colcount>2613</colcount>
+    </rastinfo>
+  </spdoinfo>
+  <spref>
+    <horizsys>
+      <planar>
+        <mapproj>
+          <mapprojn>SWA LambertAzimuthal Equal Area</mapprojn>
+          <lamberta>
+            <longpc>3.0</longpc>
+            <latprjc>11.0</latprjc>
+            <feast>0.0</feast>
+            <fnorth>0.0</fnorth>
+          </lamberta>
+        </mapproj>
+        <planci>
+          <plance>coordinate pair</plance>
+          <coordrep>
+            <absres>0.0000000028323787759632072</absres>
+            <ordres>0.0000000028323787759632072</ordres>
+          </coordrep>
+          <plandu>meter</plandu>
+        </planci>
+      </planar>
+      <geodetic>
+        <horizdn>D WGS 1984</horizdn>
+        <ellips>WGS 1984</ellips>
+        <semiaxis>6378137.0</semiaxis>
+        <denflat>298.257223563</denflat>
+      </geodetic>
+    </horizsys>
+  </spref>
+  <eainfo>
+    <detailed>
+      <enttyp>
+        <enttypl>swa.sde.SDE_VAT_68</enttypl>
+        <enttypd>West Africa 2013 land use land cover classification</enttypd>
+        <enttypds>USGS</enttypds>
+      </enttyp>
+      <attr>
+        <attrlabl>class_nom</attrlabl>
+        <attrdef>Land use land cover classification name in French</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>French land cover class description</codesetn>
+            <codesets>USGS</codesets>
+          </codesetd>
+        </attrdomv>
+        <attrdomv>
+          <udom>Land use land cover classification name in French as a string</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>value</attrlabl>
+        <attrdef>Land use land cover classification integer value. Definition of value is listed in English (Anglais) / French (Français).</attrdef>
+        <attrdefs>USGS</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>7</edomv>
+            <edomvd>Mangrove</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>15</edomv>
+            <edomvd>Gallery forest and riparian forest / Forêt galerie et formation ripicole</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>28</edomv>
+            <edomvd>Swamp forest / Forêt marécageuse</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>2</edomv>
+            <edomvd>Savanna / Savane</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>8</edomv>
+            <edomvd>Agriculture / Zone de culture</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>78</edomv>
+            <edomvd>Open mine / Carrière</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>3</edomv>
+            <edomvd>Wetland - floodplain / Prairie marécageuse - vallée inondable</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>24</edomv>
+            <edomvd>Agriculture in bottomlands and flood recessional / Cultures des bas-fonds et de décrue</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>1</edomv>
+            <edomvd>Forest / Forêt</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>99</edomv>
+            <edomvd>Cloud / Nuage</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>10</edomv>
+            <edomvd>Sandy area / Surfaces sableuses</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>12</edomv>
+            <edomvd>Bare soil / Sols dénudés</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>31</edomv>
+            <edomvd>Herbaceous savanna / Savane herbacée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>4</edomv>
+            <edomvd>Steppe</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>0</edomv>
+            <edomvd>No Data</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>27</edomv>
+            <edomvd>Cropland and fallow with oil palms / Cultures et jachère sous palmier à huile</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>32</edomv>
+            <edomvd>Shrubland / Zone arbustive</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>25</edomv>
+            <edomvd>Woodland / Forêt claire</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>13</edomv>
+            <edomvd>Settlements / Habitations</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>6</edomv>
+            <edomvd>Plantation</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>98</edomv>
+            <edomvd>Cloud shadow / Ombre de nuage</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>11</edomv>
+            <edomvd>Rocky land / Terrains rocheux</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>29</edomv>
+            <edomvd>Sahelian short grass savanna / Savane sahélienne</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>23</edomv>
+            <edomvd>Thicket / Fourré</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>5</edomv>
+            <edomvd>Oasis</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>16</edomv>
+            <edomvd>Shrub and tree savanna / Savane arbustive et arborée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>22</edomv>
+            <edomvd>Bowé</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>9</edomv>
+            <edomvd>Water bodies / Plans d'eau</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>21</edomv>
+            <edomvd>Degraded forest / Forêt dégradée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>14</edomv>
+            <edomvd>Irrigated agriculture / Cultures irriguées</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <udom>255 can also be conscider as No Data</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>code</attrlabl>
+        <attrdef>Land use land cover classification alpha code. Definition of value is listed in English (Anglais) / French (Français).</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <edom>
+            <edomv>WL</edomv>
+            <edomvd>Woodland / Forêt claire</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VO</edomv>
+            <edomvd>Oasis</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>SD</edomv>
+            <edomvd>Bare soil / Sols dénudés</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VSt</edomv>
+            <edomvd>Steppe</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VStp</edomv>
+            <edomvd>Shrub and tree savanna / Savane arbustive et arborée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VF</edomv>
+            <edomvd>Forest / Forêt</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>T</edomv>
+            <edomvd>Thicket / Fourré</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VSH</edomv>
+            <edomvd>Herbaceous savanna / Savane herbacée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>A</edomv>
+            <edomvd>Agriculture / Zone de culture</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>SS</edomv>
+            <edomvd>Sandy area / Surfaces sableuses</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>E</edomv>
+            <edomvd>Water bodies / Plans d'eau</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>B</edomv>
+            <edomvd>Bowé</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>CLDS</edomv>
+            <edomvd>Cloud shadow / Ombre de nuage</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>BL</edomv>
+            <edomvd>Agriculture in bottomlands and flood recessional / Cultures des bas-fonds et de décrue</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>SF</edomv>
+            <edomvd>Swamp forest / Forêt marécageuse</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>SR</edomv>
+            <edomvd>Rocky land / Terrains rocheux</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VP</edomv>
+            <edomvd>Wetland - floodplain / Prairie marécageuse - vallée inondable</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>AI</edomv>
+            <edomvd>Irrigated agriculture / Cultures irriguées</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VSb</edomv>
+            <edomvd>Shrubland / Zone arbustive</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VPI</edomv>
+            <edomvd>Plantation</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>AP</edomv>
+            <edomvd>Cropland and fallow with oil palms / Cultures et jachère sous palmier à huile</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>OPM</edomv>
+            <edomvd>Open mine / Carrière</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>FG</edomv>
+            <edomvd>Gallery forest and riparian forest / Forêt galerie et formation ripicole</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VM</edomv>
+            <edomvd>Mangrove</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>DVF</edomv>
+            <edomvd>Degraded forest / Forêt dégradée</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>CLD</edomv>
+            <edomvd>Cloud / Nuage</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VSS</edomv>
+            <edomvd>Sahelian short grass savanna / Savane sahélienne</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>H</edomv>
+            <edomvd>Settlements / Habitations</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+          <edom>
+            <edomv>VS</edomv>
+            <edomvd>Savanna / Savane</edomvd>
+            <edomvds>USAID/USGS West Africa Land Use Dynamics Project</edomvds>
+          </edom>
+        </attrdomv>
+        <attrdomv>
+          <udom>Three to five charator colde to represent land use land cover class.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>red</attrlabl>
+        <attrdef>Integer representing the red value of the suggest red, green, blue color in a three band composite.</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+            <attrunit>8-bit range unsigned value</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>blue</attrlabl>
+        <attrdef>Integer representing the blue value of the suggest red, green, blue color in a three band composite.</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+            <attrunit>8-bit range unsigned value</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>objectid</attrlabl>
+        <attrdef>Internal feature number.</attrdef>
+        <attrdefs>Esri</attrdefs>
+        <attrdomv>
+          <udom>Sequential unique whole numbers that are automatically generated.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>class_name</attrlabl>
+        <attrdef>Land use land cover classification name in English</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <codesetd>
+            <codesetn>English Land cover descriiption</codesetn>
+            <codesets>USGS</codesets>
+          </codesetd>
+        </attrdomv>
+        <attrdomv>
+          <udom>Classification name in English as a string</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>count</attrlabl>
+        <attrdef>Land use land cover pixel count</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>1233903</rdommax>
+            <attrunit>Count of the number of individual land use land cover pixel (2000 km x 2000 km).</attrunit>
+          </rdom>
+        </attrdomv>
+        <attrdomv>
+          <udom>Pixel Count value, in count should not exceed 2,108,691 pixel.</udom>
+        </attrdomv>
+      </attr>
+      <attr>
+        <attrlabl>green</attrlabl>
+        <attrdef>Integer representing the green value of the suggest red, green, blue color in a three band composite.</attrdef>
+        <attrdefs>USAID/USGS West Africa Land Use Dynamics Project</attrdefs>
+        <attrdomv>
+          <rdom>
+            <rdommin>0</rdommin>
+            <rdommax>255</rdommax>
+            <attrunit>8-bit range unsigned value</attrunit>
+          </rdom>
+        </attrdomv>
+      </attr>
+    </detailed>
+  </eainfo>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey, Earth Resources Observation and Science (EROS) Center</cntorg>
+          <cntper>Wm Matthew Cushing</cntper>
+        </cntorgp>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>South Dakota</state>
+          <postal>57198</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>605 594-2766</cntvoice>
+        <cntemail>mcushing@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <resdesc>Microsoft Excel compressed spreadsheet</resdesc>
+    <distliab>Although these data have been used by the U.S. Geological Survey, U.S. Department of the Interior, no warranty expressed or implied is made by the U.S. Geological Survey as to the accuracy of the data. The act of distribution shall not constitute any such warranty, and no responsibility is assumed by the U.S. Geological Survey in the use of these data, software, or related materials. The use of firm, trade, or brand names in this report is for identification purposes only and does not constitute endorsement by the U.S. Geological Survey. The names mentioned in this document may be trademarks or registered trademarks of their respective trademark owners.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>TIFF</formname>
+          <formvern>none</formvern>
+          <formspec>GeoTIFF</formspec>
+          <formcont>A zip archive containing the GeoTIFF image representing the 1975 West Africa land use land cover, associated word file, and metadata</formcont>
+          <transize>0.5</transize>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/wafrica/downloads/data/west_africa_land-use_land-cover_2000_2km.zip</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/wafrica/downloads/data/west_africa_land-use_land-cover_2013_2km.zip</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/wafrica/downloads/data/west_africa_land-use_land-cover_1975_2km.zip</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>http://edcintl.cr.usgs.gov/arcgis/services/WestAfrica/west_africa_lulc/MapServer/WMSServer</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>http://edcintl.cr.usgs.gov/downloads/sciweb1/shared/wafrica/downloads/data/west_africa_land-use_land-cover_tables.zip</networkr>
+              </networka>
+            </computer>
+            <accinstr>Microsoft Excel compressed spreadsheet</accinstr>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>None</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20161207</metd>
+    <metc>
+      <cntinfo>
+        <cntorgp>
+          <cntorg>U.S. Geological Survey</cntorg>
+          <cntper>Wm Matthew Cushing</cntper>
+        </cntorgp>
+        <cntpos>GIS Specialist</cntpos>
+        <cntaddr>
+          <addrtype>mailing and physical</addrtype>
+          <address>47914 252nd Street</address>
+          <city>Sioux Falls</city>
+          <state>South Dakota</state>
+          <postal>57198</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>605 594-2766</cntvoice>
+        <cntemail>mcushing@usgs.gov</cntemail>
+        <hours>9:00 to 16:00</hours>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+    <mettc>local time</mettc>
+  </metainfo>
+</metadata>

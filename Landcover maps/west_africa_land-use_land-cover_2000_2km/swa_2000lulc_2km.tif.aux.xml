@@ -1,0 +1,365 @@
+<PAMDataset>
+  <Metadata>
+    <MDI key="DataType">Generic</MDI>
+  </Metadata>
+  <Metadata domain="Esri">
+    <MDI key="PyramidResamplingType">NEAREST</MDI>
+  </Metadata>
+  <PAMRasterBand band="1">
+    <Histograms>
+      <HistItem>
+        <HistMin>-0.5</HistMin>
+        <HistMax>99.5</HistMax>
+        <BucketCount>100</BucketCount>
+        <IncludeOutOfRange>1</IncludeOutOfRange>
+        <Approximate>0</Approximate>
+        <HistCounts>0|25141|355901|26127|221229|0|4915|4925|208486|12091|34086|14996|22215|6147|2322|24091|0|0|0|0|0|37246|14449|6160|3913|25823|0|2648|6386|168656|0|5624|152|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|118|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|56</HistCounts>
+      </HistItem>
+    </Histograms>
+    <GDALRasterAttributeTable>
+      <FieldDefn index="0">
+        <Name>objectid</Name>
+        <Type>0</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="1">
+        <Name>value</Name>
+        <Type>0</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="2">
+        <Name>count</Name>
+        <Type>1</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="3">
+        <Name>class_name</Name>
+        <Type>2</Type>
+        <Usage>2</Usage>
+      </FieldDefn>
+      <FieldDefn index="4">
+        <Name>class_nom</Name>
+        <Type>2</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="5">
+        <Name>code</Name>
+        <Type>2</Type>
+        <Usage>0</Usage>
+      </FieldDefn>
+      <FieldDefn index="6">
+        <Name>red</Name>
+        <Type>0</Type>
+        <Usage>6</Usage>
+      </FieldDefn>
+      <FieldDefn index="7">
+        <Name>green</Name>
+        <Type>0</Type>
+        <Usage>7</Usage>
+      </FieldDefn>
+      <FieldDefn index="8">
+        <Name>blue</Name>
+        <Type>0</Type>
+        <Usage>8</Usage>
+      </FieldDefn>
+      <Row index="0">
+        <F>1</F>
+        <F>1</F>
+        <F>25141</F>
+        <F>Forest</F>
+        <F>Forêt</F>
+        <F>VF</F>
+        <F>132</F>
+        <F>0</F>
+        <F>168</F>
+      </Row>
+      <Row index="1">
+        <F>2</F>
+        <F>2</F>
+        <F>355901</F>
+        <F>Savanna</F>
+        <F>Savane</F>
+        <F>VS</F>
+        <F>139</F>
+        <F>173</F>
+        <F>139</F>
+      </Row>
+      <Row index="2">
+        <F>3</F>
+        <F>3</F>
+        <F>26127</F>
+        <F>Wetland - floodplain</F>
+        <F>Prairie marécageuse - vallée inondable</F>
+        <F>VP</F>
+        <F>0</F>
+        <F>0</F>
+        <F>128</F>
+      </Row>
+      <Row index="3">
+        <F>4</F>
+        <F>4</F>
+        <F>221229</F>
+        <F>Steppe</F>
+        <F>Steppe</F>
+        <F>VSt</F>
+        <F>255</F>
+        <F>204</F>
+        <F>153</F>
+      </Row>
+      <Row index="4">
+        <F>5</F>
+        <F>6</F>
+        <F>4915</F>
+        <F>Plantation</F>
+        <F>Plantation</F>
+        <F>VPI</F>
+        <F>128</F>
+        <F>128</F>
+        <F>0</F>
+      </Row>
+      <Row index="5">
+        <F>6</F>
+        <F>7</F>
+        <F>4925</F>
+        <F>Mangrove</F>
+        <F>Mangrove</F>
+        <F>VM</F>
+        <F>51</F>
+        <F>204</F>
+        <F>204</F>
+      </Row>
+      <Row index="6">
+        <F>7</F>
+        <F>8</F>
+        <F>208486</F>
+        <F>Agriculture</F>
+        <F>Zone de culture</F>
+        <F>A</F>
+        <F>255</F>
+        <F>255</F>
+        <F>150</F>
+      </Row>
+      <Row index="7">
+        <F>8</F>
+        <F>9</F>
+        <F>12091</F>
+        <F>Water bodies</F>
+        <F>Plans d'eau</F>
+        <F>E</F>
+        <F>51</F>
+        <F>102</F>
+        <F>255</F>
+      </Row>
+      <Row index="8">
+        <F>9</F>
+        <F>10</F>
+        <F>34086</F>
+        <F>Sandy area</F>
+        <F>Surfaces sableuses</F>
+        <F>SS</F>
+        <F>255</F>
+        <F>153</F>
+        <F>204</F>
+      </Row>
+      <Row index="9">
+        <F>10</F>
+        <F>11</F>
+        <F>14996</F>
+        <F>Rocky land</F>
+        <F>Terrains rocheux</F>
+        <F>SR</F>
+        <F>150</F>
+        <F>150</F>
+        <F>150</F>
+      </Row>
+      <Row index="10">
+        <F>11</F>
+        <F>12</F>
+        <F>22215</F>
+        <F>Bare soil</F>
+        <F>Sols dénudés</F>
+        <F>SD</F>
+        <F>168</F>
+        <F>112</F>
+        <F>0</F>
+      </Row>
+      <Row index="11">
+        <F>12</F>
+        <F>13</F>
+        <F>6147</F>
+        <F>Settlements</F>
+        <F>Habitations</F>
+        <F>H</F>
+        <F>255</F>
+        <F>0</F>
+        <F>0</F>
+      </Row>
+      <Row index="12">
+        <F>13</F>
+        <F>14</F>
+        <F>2322</F>
+        <F>Irrigated agriculture</F>
+        <F>Cultures irriguées</F>
+        <F>AI</F>
+        <F>204</F>
+        <F>255</F>
+        <F>102</F>
+      </Row>
+      <Row index="13">
+        <F>14</F>
+        <F>15</F>
+        <F>24091</F>
+        <F>Gallery forest and riparian forest</F>
+        <F>Forêt galerie et formation ripicole</F>
+        <F>FG</F>
+        <F>169</F>
+        <F>92</F>
+        <F>230</F>
+      </Row>
+      <Row index="14">
+        <F>15</F>
+        <F>21</F>
+        <F>37246</F>
+        <F>Degraded forest</F>
+        <F>Forêt dégradée</F>
+        <F>DVF</F>
+        <F>210</F>
+        <F>150</F>
+        <F>230</F>
+      </Row>
+      <Row index="15">
+        <F>16</F>
+        <F>22</F>
+        <F>14449</F>
+        <F>Bowe</F>
+        <F>Bowé</F>
+        <F>B</F>
+        <F>168</F>
+        <F>56</F>
+        <F>0</F>
+      </Row>
+      <Row index="16">
+        <F>17</F>
+        <F>23</F>
+        <F>6160</F>
+        <F>Thicket</F>
+        <F>Fourré</F>
+        <F>T</F>
+        <F>245</F>
+        <F>162</F>
+        <F>122</F>
+      </Row>
+      <Row index="17">
+        <F>18</F>
+        <F>24</F>
+        <F>3913</F>
+        <F>Agriculture in shallows and recession</F>
+        <F>Cultures des bas-fonds et de décrue</F>
+        <F>BL</F>
+        <F>235</F>
+        <F>201</F>
+        <F>97</F>
+      </Row>
+      <Row index="18">
+        <F>19</F>
+        <F>25</F>
+        <F>25823</F>
+        <F>Woodland</F>
+        <F>Forêt claire</F>
+        <F>WL</F>
+        <F>40</F>
+        <F>115</F>
+        <F>75</F>
+      </Row>
+      <Row index="19">
+        <F>20</F>
+        <F>27</F>
+        <F>2648</F>
+        <F>Cropland and fallow with oil palms</F>
+        <F>Cultures et jachère sous palmier à huile</F>
+        <F>AP</F>
+        <F>235</F>
+        <F>223</F>
+        <F>115</F>
+      </Row>
+      <Row index="20">
+        <F>21</F>
+        <F>28</F>
+        <F>6386</F>
+        <F>Swamp forest</F>
+        <F>Forêt marécageuse</F>
+        <F>SF</F>
+        <F>190</F>
+        <F>255</F>
+        <F>166</F>
+      </Row>
+      <Row index="21">
+        <F>22</F>
+        <F>29</F>
+        <F>168656</F>
+        <F>Sahelian short grass savanna</F>
+        <F>Savane sahélienne</F>
+        <F>VSS</F>
+        <F>166</F>
+        <F>194</F>
+        <F>140</F>
+      </Row>
+      <Row index="22">
+        <F>23</F>
+        <F>31</F>
+        <F>5624</F>
+        <F>Herbaceous savanna</F>
+        <F>Savane herbacée</F>
+        <F>VSH</F>
+        <F>10</F>
+        <F>150</F>
+        <F>150</F>
+      </Row>
+      <Row index="23">
+        <F>24</F>
+        <F>32</F>
+        <F>152</F>
+        <F>Shrubland</F>
+        <F>Zone arbustive</F>
+        <F>VSb</F>
+        <F>116</F>
+        <F>147</F>
+        <F>115</F>
+      </Row>
+      <Row index="24">
+        <F>25</F>
+        <F>78</F>
+        <F>118</F>
+        <F>Open mine</F>
+        <F>Carrière</F>
+        <F>OPM</F>
+        <F>80</F>
+        <F>80</F>
+        <F>80</F>
+      </Row>
+      <Row index="25">
+        <F>26</F>
+        <F>99</F>
+        <F>56</F>
+        <F>Cloud</F>
+        <F>Nuage</F>
+        <F>CLD</F>
+        <F>255</F>
+        <F>255</F>
+        <F>255</F>
+      </Row>
+    </GDALRasterAttributeTable>
+    <Metadata>
+      <MDI key="RepresentationType">THEMATIC</MDI>
+      <MDI key="SourceBandIndex">0</MDI>
+      <MDI key="STATISTICS_COVARIANCES">95.02288653843175</MDI>
+      <MDI key="STATISTICS_EXCLUDEDVALUES"></MDI>
+      <MDI key="STATISTICS_MAXIMUM">99</MDI>
+      <MDI key="STATISTICS_MEAN">9.8091884045991</MDI>
+      <MDI key="STATISTICS_MINIMUM">1</MDI>
+      <MDI key="STATISTICS_SKIPFACTORX">1</MDI>
+      <MDI key="STATISTICS_SKIPFACTORY">1</MDI>
+      <MDI key="STATISTICS_STDDEV">9.7479683287561</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
