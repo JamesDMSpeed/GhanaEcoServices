@@ -106,5 +106,30 @@ count(GhanaUses, c("Category", "Species")) # Number of entries per species in ea
 GhanaCount<-count(GhanaUses, c("Category")) 
 colnames(GhanaCount)[2]<-"Number_records"
 ggplot(GhanaCount, aes(y=Number_records, x=Category))+geom_bar(stat = "identity")
-# Most of them are health care...
+# Most of records are for health care...but this is total number of records not number of species
+# Maximum species records ~590 (including issues above)...not >750 spp
 
+# Number of species within each category - need to remove duplicates
+# Create a unique code for each species - category combination
+GhanaUses$spp_cat<-as.factor(with(GhanaUses, paste(Species,Category, sep="_")))
+levels(GhanaUses$spp_cat)
+
+dim(GhanaUses[duplicated(GhanaUses$spp_cat), ]) #404 duplicates
+GhanaUses2<-GhanaUses[!duplicated(GhanaUses$spp_cat), ]
+dim(GhanaUses) # 1038   16
+dim(GhanaUses2) # 634  16
+
+# Plot number of records again - without duplicate species entries within each category
+GhanaCount2<-count(GhanaUses2, c("Category")) 
+colnames(GhanaCount2)[2]<-"Number_records_per_spp"
+ggplot(GhanaCount2, aes(y=Number_records_per_spp, x=Category))+geom_bar(stat = "identity")
+# Now max < 500 - correct...
+
+# Health care outstrips everything else - so perhaps also remove health care and present other categories
+GhanaCount2hc<-GhanaCount2[GhanaCount2$Category!="Health care",]
+ggplot(GhanaCount2hc, aes(y=Number_records_per_spp, x=Category))+geom_bar(stat = "identity")
+# Agriculture second most records for enthnobotanical uses
+
+#########################################################################
+# END #
+#########################################################################
