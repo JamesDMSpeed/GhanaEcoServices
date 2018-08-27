@@ -1,4 +1,5 @@
 #Ghana plants
+#Install packages
 require(data.table)
 require(raster)
 require(dismo)
