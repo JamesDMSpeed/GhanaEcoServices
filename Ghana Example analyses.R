@@ -8,8 +8,6 @@ require(ENMeval)
 #Get data
 ghanaplants<-fread('occurrence.txt')
 
-
-
 head(ghanaplants)
 summary(ghanaplants)
 
