@@ -17,6 +17,7 @@ length(levels(as.factor(ghanaplants$species)))
 
 #Drop records missing species
 ghana_species<-ghanaplants[ghanaplants$species!="",]
+View(ghana_species)
 
 #Make spatial point data frame
 ghana_species_pts<-SpatialPointsDataFrame(cbind(ghana_species$decimalLongitude,ghana_species$decimalLatitude),ghana_species,
