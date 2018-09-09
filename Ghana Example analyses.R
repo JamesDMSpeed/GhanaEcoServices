@@ -62,6 +62,7 @@ with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length)
 
 #Elevation data
 ghanaalt<-getData('alt',country='GHA')
+
 levelplot(ghanaalt,margin=F,main='Elevation (m)')+
   layer(sp.polygons(ghanamap))
 
@@ -81,7 +82,9 @@ pairs(ghana1)#Many highly correlated varaibles as expected
 climdat<-values(ghana1)
 dim(climdat)
 #Remove NAs
+
 climdat1<-climdat[!is.na(climdat[,1]),]
+
 
 pca1<-princomp(climdat1)
 plot(pca1)
@@ -98,7 +101,19 @@ ghanalc1975<-mask(crop(lc1975,ghanat),ghanat)
 plot(ghanalc1975)
 #NB legend is in RAT table
 levels(ghanalc1975)
+
 #Do the same with other years too
+lc2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2000lulc_2km.tif')
+ghanat<-spTransform(ghanamap,crs(lc2000))
+ghanalc2000<-mask(crop(lc2000,ghanat),ghanat)
+plot(ghanalc2000)
+levels(ghanalc2000)
+
+lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
+ghanat<-spTransform(ghanamap,crs(lc2013))
+ghanalc2013<-mask(crop(lc2013,ghanat),ghanat)
+plot(ghanalc2013)
+levels(ghanalc2013)
 
 #Choose a species #Pterocarpus erinaceus
 pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pterocarpus erinaceus',]
