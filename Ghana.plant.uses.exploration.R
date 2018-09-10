@@ -17,7 +17,7 @@ library(ggplot2)
 # Import Sarah's Ghana plant uses category dataset
 
 # Importat data with file name
-GhanaUses<-read.csv(file="Ghana.plants.uses.category.csv", sep=",",header=TRUE)
+GhanaUses<-read.csv(file="Ghana.plants.uses.category.new.csv", sep=",",header=TRUE,strip.white=T)
 
 # Basic exploration of dataset
 names(GhanaUses)
