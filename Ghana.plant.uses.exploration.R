@@ -145,19 +145,13 @@ match(GhanaUses$Species,gbifrecs$species)
 GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F]
 #List these
 unmatchedspp<-levels(droplevels((GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F])))
+unmatchedspp
 #Check names using taxonomic name resolution service in taxize (first 5)
 tnrs(unmatchedspp[1:5])
 #Note that Adiatum changed to Adiantum, A. kameruneensis to A. kamerunensis
 
 #Check these in GBIF
-checkednames<-tnrs(unmatchedspp[1:5])
-checkednames$acceptedname%in%gbifrecs$species #All found apart from genus only records
-
-#This fails if called on species names with trailing spaces (not sure why strip.white did not fix this...)
-tnrs(unmatchedspp[7])
-#Also fails to identify one with encoding issues to species level
-tnrs(unmatchedspp[13])
-
+checkednames<-tnrs(unmatchedspp)
 
 #########################################################################
 # END #
