@@ -13,11 +13,12 @@ library(lubridate)
 library(data.table)
 library(xlsx)
 library(ggplot2)
+library(taxize)
 ##########################################################################
 # Import Sarah's Ghana plant uses category dataset
 
 # Importat data with file name
-GhanaUses<-read.csv(file="Ghana.plants.uses.category.csv", sep=",",header=TRUE)
+GhanaUses<-read.csv(file="Ghana.plants.uses.category.new.csv", sep=",",header=TRUE,strip.white=T)
 
 # Basic exploration of dataset
 names(GhanaUses)
@@ -129,6 +130,34 @@ ggplot(GhanaCount2, aes(y=Number_records_per_spp, x=Category))+geom_bar(stat = "
 GhanaCount2hc<-GhanaCount2[GhanaCount2$Category!="Health care",]
 ggplot(GhanaCount2hc, aes(y=Number_records_per_spp, x=Category))+geom_bar(stat = "identity")
 # Agriculture second most records for enthnobotanical uses
+
+#############################################################################
+#Matching species to GBIF data
+
+#GBIF records
+gbifrecs<-fread('occurrence. Sarah.txt')
+head(gbifrecs)
+summary(gbifrecs)
+
+#Use match
+match(GhanaUses$Species,gbifrecs$species)
+#Use %in% to identify species without GBIF matches
+GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F]
+#List these
+unmatchedspp<-levels(droplevels((GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F])))
+#Check names using taxonomic name resolution service in taxize (first 5)
+tnrs(unmatchedspp[1:5])
+#Note that Adiatum changed to Adiantum, A. kameruneensis to A. kamerunensis
+
+#Check these in GBIF
+checkednames<-tnrs(unmatchedspp[1:5])
+checkednames$acceptedname%in%gbifrecs$species #All found apart from genus only records
+
+#This fails if called on species names with trailing spaces (not sure why strip.white did not fix this...)
+tnrs(unmatchedspp[7])
+#Also fails to identify one with encoding issues to species level
+tnrs(unmatchedspp[13])
+
 
 #########################################################################
 # END #
