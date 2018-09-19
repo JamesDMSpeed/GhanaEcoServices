@@ -14,6 +14,7 @@ library(data.table)
 library(xlsx)
 library(ggplot2)
 library(taxize)
+library(Taxonstand)
 ##########################################################################
 # Import Sarah's Ghana plant uses category dataset
 
@@ -146,12 +147,26 @@ GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F]
 #List these
 unmatchedspp<-levels(droplevels((GhanaUses$Species[GhanaUses$Species%in%gbifrecs$species==F])))
 unmatchedspp
-#Check names using taxonomic name resolution service in taxize (first 5)
-tnrs(unmatchedspp[1:5])
-#Note that Adiatum changed to Adiantum, A. kameruneensis to A. kamerunensis
 
-#Check these in GBIF
-checkednames<-tnrs(unmatchedspp)
+#Check matches using the names according to gbif column
+GhanaUses$Species.name.in.GBIF[GhanaUses$Species.name.in.GBIF%in%gbifrecs$species==F]
+unmatchedspp_gbifname<-levels(droplevels((GhanaUses$Species.name.in.GBIF[GhanaUses$Species.name.in.GBIF%in%gbifrecs$species==F])))
+unmatchedspp_gbifname #18 species without GBIF data. Plus many records where there in 'None' writting in GBIF name column
+
+#Look for alternative names for these
+#Using Taxonstand rather than taxize as this seems to be more robust for plants
+#tnrs(unmatchedspp_gbifname)
+TPL(unmatchedspp_gbifname)
+taxonstandlookup<-TPL(unmatchedspp)
+#Check corrected names
+namecheck<-data.frame(cbind(input=taxonstandlookup$Taxon, newname=paste(taxonstandlookup$New.Genus,taxonstandlookup$New.Species)))
+namecheck
+
+match(namecheck$newname,gbifrecs$species) # We find a match for many of these. 
+#not all species are matched, but some are species that are useful but may not be present in Ghana (natives) like Allium sativum and Aloe vera
+
+#Next, to make a column with the names that match to GBIF including the taxonstand names
+
 
 #########################################################################
 # END #
