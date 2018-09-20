@@ -167,7 +167,32 @@ match(namecheck$newname,gbifrecs$species) # We find a match for many of these.
 
 #Next, to make a column with the names that match to GBIF including the taxonstand names
 
+#Check all names with TPL
+checkallnames<-TPL(GhanaUses$Species)
+#Write as a column
+GhanaUses$CheckedNames<-paste(checkallnames$New.Genus,checkallnames$New.Species)
+GhanaUses[GhanaUses$CheckedNames%in%gbifrecs$species==F,c(1,2,19)]
 
+#Summarize number of records per species in gbifdataset
+gbifrecsperspp<-aggregate.data.frame(gbifrecs$species,by=list(gbifrecs$species),length)
+names(gbifrecsperspp)<-c('gbifspeciesname','numberrecords')
+
+#Match number of records to species name
+GhanaUses$NumberGBIFrecords<-gbifrecsperspp$numberrecords[match(GhanaUses$Species.name.in.GBIF,gbifrecsperspp$gbifspeciesname)]
+View(GhanaUses)#This looks good
+
+#Checking the species that did not match
+GhanaUses[is.na(GhanaUses$NumberGBIFrecords),]
+match(GhanaUses$CheckedNames[is.na(GhanaUses$NumberGBIFrecords)],gbifrecs$species)#Some of these are in GBIF under checked names
+
+GhanaUses$ConfirmedSppNames<-as.character(GhanaUses$Species.name.in.GBIF)
+GhanaUses$ConfirmedSppNames[which(is.na(GhanaUses$NumberGBIFrecords))]<-as.character(GhanaUses$CheckedNames[which(is.na(GhanaUses$NumberGBIFrecords))])
+
+GhanaUses$GBIFrecswithconfirmendnames<-gbifrecsperspp$numberrecords[match(GhanaUses$ConfirmedSppNames,gbifrecsperspp$gbifspeciesname)]
+
+#Clean a bit to remove superflous species names and counts
+FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Category','Use','Group','Location','Authors','Title','Journal','Volume','Pages','GBIFrecswithconfirmendnames'))
+write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
 #########################################################################
 # END #
 #########################################################################
