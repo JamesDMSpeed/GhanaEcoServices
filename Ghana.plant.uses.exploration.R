@@ -193,6 +193,7 @@ GhanaUses$GBIFrecswithconfirmendnames<-gbifrecsperspp$numberrecords[match(GhanaU
 #Clean a bit to remove superflous species names and counts
 FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Category','Use','Group','Location','Authors','Title','Journal','Volume','Pages','GBIFrecswithconfirmendnames'))
 write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
+
 #########################################################################
 # END #
 #########################################################################
