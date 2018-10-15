@@ -19,8 +19,9 @@ library(Taxonstand)
 # Import Sarah's Ghana plant uses category dataset
 
 # Import data with file name
-setwd("/Users/anotherswsmith/Documents/GhanaEcoServices-master")
+
 GhanaUses<-read.csv(file="Ghana.plants.uses.category.new.csv", sep=",",header=TRUE,strip.white=T)
+
 
 # Basic exploration of dataset
 names(GhanaUses)
@@ -144,7 +145,11 @@ Eplot
 #Matching species to GBIF data
 
 #GBIF records
-gbifrecs<-fread('occurrence. Sarah.txt')
+#gbifrecs<-fread('occurrence. Sarah.txt')
+
+#Read directly from zip directory
+gbifrecs<-read.delim(unz('occurrence.new.txt.zip','occurrence.new.txt'),sep='\t',quote="",dec='.',header=T)
+
 head(gbifrecs)
 summary(gbifrecs)
 
