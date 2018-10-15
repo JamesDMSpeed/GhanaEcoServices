@@ -148,7 +148,7 @@ Eplot
 #gbifrecs<-fread('occurrence. Sarah.txt')
 
 #Read directly from zip directory
-gbifrecs<-read.delim(unz('occurrence.new.txt.zip','occurrence.new.txt'),sep='\t',quote="",dec='.',header=T)
+gbifrecs<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
 
 head(gbifrecs)
 summary(gbifrecs)
