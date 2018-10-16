@@ -152,9 +152,12 @@ gbifrecs<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',q
 head(gbifrecs)
 summary(gbifrecs)
 
+#Remove records with missing species
+gbifrecs<-gbifrecs[gbifrecs$species!="",]
+
 #use aggregate to sum the number of records within each species
 recs_per_spp<-tapply(gbifrecs$species,gbifrecs$species,length)
-as.data.frame(recs_per_spp)
+tail(sort(recs_per_spp))#1 to 1941 records per species
 
 #Use match
 match(GhanaUses$Species,gbifrecs$species)
@@ -187,7 +190,7 @@ match(namecheck$newname,gbifrecs$species) # We find a match for many of these.
 checkallnames<-TPL(GhanaUses$Species)
 #Write as a column
 GhanaUses$CheckedNames<-paste(checkallnames$New.Genus,checkallnames$New.Species)
-GhanaUses[GhanaUses$CheckedNames%in%gbifrecs$species==F,c(1,2,19)]
+GhanaUses[GhanaUses$CheckedNames%in%gbifrecs$species==F,c(1,2,18)]
 
 #Summarize number of records per species in gbifdataset
 gbifrecsperspp<-aggregate.data.frame(gbifrecs$species,by=list(gbifrecs$species),length)
@@ -208,7 +211,17 @@ GhanaUses$GBIFrecswithconfirmendnames<-gbifrecsperspp$numberrecords[match(GhanaU
 
 #Clean a bit to remove superflous species names and counts
 FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Category','Use','Group','Location','Authors','Title','Journal','Volume','Pages','GBIFrecswithconfirmendnames'))
-write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
+
+#Uncomment thtis line to overwrite the dataset
+#write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
+
+
+###################################################33
+
+# Category count analysis -------------------------------------------------
+speciesdata<-read.csv('FinalDataSpeciesNames.csv')
+
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
 
 #########################################################################
 # END #
