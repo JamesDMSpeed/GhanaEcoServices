@@ -150,6 +150,8 @@ Eplot
 #Read directly from zip directory
 gbifrecs<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
 
+#use aggregate to sum the number of records within each category
+gbifrecs<-aggregate(No..of.occurrences.in.GBIF~Category,GhanaUses,sum)
 head(gbifrecs)
 summary(gbifrecs)
 
