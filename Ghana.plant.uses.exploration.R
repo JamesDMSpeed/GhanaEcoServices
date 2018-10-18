@@ -210,10 +210,10 @@ GhanaUses$ConfirmedSppNames[which(is.na(GhanaUses$NumberGBIFrecords))]<-as.chara
 GhanaUses$GBIFrecswithconfirmendnames<-gbifrecsperspp$numberrecords[match(GhanaUses$ConfirmedSppNames,gbifrecsperspp$gbifspeciesname)]
 
 #Clean a bit to remove superflous species names and counts
-FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Category','Use','Group','Location','Authors','Title','Journal','Volume','Pages','GBIFrecswithconfirmendnames'))
-
+FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Species','Category','Use','Group','Location','Authors','Title','Journal','Volume','Pages','GBIFrecswithconfirmendnames'))
+View(FinalDataSet)
 #Uncomment thtis line to overwrite the dataset
-#write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
+write.csv(FinalDataSet,'FinalDataSpeciesNames.csv')
 
 
 ###################################################33
@@ -221,7 +221,24 @@ FinalDataSet<-subset(GhanaUses,select=c('ConfirmedSppNames','Category','Use','Gr
 # Category count analysis -------------------------------------------------
 speciesdata<-read.csv('FinalDataSpeciesNames.csv')
 
+#Count GBIF records per category
 with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Health care
+with(droplevels(speciesdata[speciesdata$Category=='Health care',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within health care
+with(droplevels(speciesdata[speciesdata$Category=='Health care',]),tapply(ConfirmedSppNames,Group,length))
+
+
+####################################################
+#Subsettting GBIF data to get different categories
+
+#Remove rows with no GBIF spp name
+speciesdata1<-speciesdata[speciesdata$ConfirmedSppNames!='None',]
+agricult_gbif<-gbifrecs[gbifrecs$species%in%speciesdata1$ConfirmedSppNames[speciesdata1$Category=='Agriculture'],]
+dim(agricult_gbif)
+
 
 #########################################################################
 # END #
