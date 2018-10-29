@@ -151,6 +151,7 @@ Eplot
 gbifrecs<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
 head(gbifrecs)
 summary(gbifrecs)
+dim(gbifrecs)
 
 #Remove records with missing species
 gbifrecs<-gbifrecs[gbifrecs$species!="",]
@@ -230,6 +231,68 @@ with(speciesdata,tapply(ConfirmedSppNames,Category,length))
 #Count species in each group within health care
 with(droplevels(speciesdata[speciesdata$Category=='Health care',]),tapply(ConfirmedSppNames,Group,length))
 
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Agriculture
+with(droplevels(speciesdata[speciesdata$Category=='Agriculture',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Agriculture
+with(droplevels(speciesdata[speciesdata$Category=='Agriculture',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Construction
+with(droplevels(speciesdata[speciesdata$Category=='Construction',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Construction
+with(droplevels(speciesdata[speciesdata$Category=='Construction',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within culture
+with(droplevels(speciesdata[speciesdata$Category=='Culture',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Culture
+with(droplevels(speciesdata[speciesdata$Category=='Culture',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Energy
+with(droplevels(speciesdata[speciesdata$Category=='Energy',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Energy
+with(droplevels(speciesdata[speciesdata$Category=='Energy',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Food and nutrition
+with(droplevels(speciesdata[speciesdata$Category=='Food and nutrition',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Food and nutrition
+with(droplevels(speciesdata[speciesdata$Category=='Food and nutrition',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Social
+with(droplevels(speciesdata[speciesdata$Category=='Social',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Social
+with(droplevels(speciesdata[speciesdata$Category=='Social',]),tapply(ConfirmedSppNames,Group,length))
+
+#Count GBIF records per category
+with(speciesdata,tapply(GBIFrecswithconfirmendnames,Category,sum,na.rm=T))
+#Count GBIF records per group within Water purification
+with(droplevels(speciesdata[speciesdata$Category=='Water purification',]),tapply(GBIFrecswithconfirmendnames,Group,sum,na.rm=T))
+#Count species in each category
+with(speciesdata,tapply(ConfirmedSppNames,Category,length))
+#Count species in each group within Water purification
+with(droplevels(speciesdata[speciesdata$Category=='Water purification',]),tapply(ConfirmedSppNames,Group,length))
 
 ####################################################
 #Subsettting GBIF data to get different categories
