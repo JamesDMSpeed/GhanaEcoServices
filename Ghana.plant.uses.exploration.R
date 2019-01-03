@@ -13,7 +13,7 @@ library(lubridate)
 library(data.table)
 library(xlsx)
 library(ggplot2)
-library(taxize)
+#library(taxize)
 library(Taxonstand)
 ##########################################################################
 # Import Sarah's Ghana plant uses category dataset
@@ -175,7 +175,7 @@ unmatchedspp_gbifname #18 species without GBIF data. Plus many records where the
 #Look for alternative names for these
 #Using Taxonstand rather than taxize as this seems to be more robust for plants
 #tnrs(unmatchedspp_gbifname)
-TPL(unmatchedspp_gbifname)
+#TPL(unmatchedspp_gbifname)
 taxonstandlookup<-TPL(unmatchedspp)
 #Check corrected names
 namecheck<-data.frame(cbind(input=taxonstandlookup$Taxon, newname=paste(taxonstandlookup$New.Genus,taxonstandlookup$New.Species)))
