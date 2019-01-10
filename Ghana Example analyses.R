@@ -7,26 +7,36 @@ require(rasterVis)
 require(ENMeval)
 
 #Get data
-ghanaplants<-fread('occurrence.txt')
+data<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
+data<-data[!is.na(data$decimalLatitude),]
+coords <- cbind(data$decimalLongitude, data$decimalLatitude)
+ghana_species_pts <- SpatialPointsDataFrame(coords, data, proj4string = CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'))
+crs(dataSpatial)
+crs(ghanamap)
 
-head(ghanaplants)
-summary(ghanaplants)
+plot(ghanamap)
+plot(dataSpatial, add=T)
+head(GhanaUses)
+summary(GhanaUses)
 
 #Number of species
-length(levels(as.factor(ghanaplants$species)))
+length(levels(as.factor(GhanaUses$Species)))
 
 #Drop records missing species
-ghana_species<-ghanaplants[ghanaplants$species!="",]
-View(ghana_species)
+Ghana_Species<-GhanaUses[GhanaUses$Species!="",]
+#Ghana_Species<-GhanaUses[!is.na(GhanaUses$Species),]
+View(Ghana_Species)
 
 #Make spatial point data frame
-ghana_species_pts<-SpatialPointsDataFrame(cbind(ghana_species$decimalLongitude,ghana_species$decimalLatitude),ghana_species,
-                                          proj4string = CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'))
+Ghana_Species_pts<-SpatialPointsDataFrame(cbind(Ghana_Species$DecimalLongitude,Ghana_Species$DecimalLatitude),Ghana_Species,
+proj4string = CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'))
 
-#Plot map of Ghana regions
+#Plot map of Ghana regions 
 ghanamap<-getData('GADM',country='GHA',level=1)
 plot(ghanamap)
-points(ghana_species_pts,pch=16,cex=0.1,col='red') #Species occurence points
+plot(dataSpatial, add=T)
+crs(ghanamap)
+points(Ghana_Species_pts,pch=16,cex=0.1,col='red') #Species occurence points
 
 #Extract records outside of Ghana land (i.e. sea, other countries)
 ghana_species_pts_insidemap<-ghana_species_pts[ghanamap,]
@@ -115,10 +125,41 @@ ghanalc2013<-mask(crop(lc2013,ghanat),ghanat)
 plot(ghanalc2013)
 levels(ghanalc2013)
 
+#Population data
+pd2000<-raster('human population data/gpw2000_30_sec.tif')
+pd2000ghana1<-crop(pd2000,ghanamap)
+pd2000ghana<-mask(pd2000ghana1,ghanamap)
+plot(pd2000ghana)
+
+pd2005<-raster('human population data/gpw2005_30_sec.tif')
+pd2005ghana1<-crop(pd2005,ghanamap)
+pd2005ghana<-mask(pd2005ghana1,ghanamap)
+plot(pd2005ghana)
+
+pd2010<-raster('human population data/gpw2010_30_sec.tif')
+pd2010ghana1<-crop(pd2010,ghanamap)
+pd2010ghana<-mask(pd2010ghana1,ghanamap)
+plot(pd2010ghana)
+
+pd2015<-raster('human population data/gpw2015_30_sec.tif')
+pd2015ghana1<-crop(pd2015,ghanamap)
+pd2015ghana<-mask(pd2015ghana1,ghanamap)
+plot(pd2015ghana)
+
+pd2020<-raster('human population data/gpw2020_30_sec.tif')
+pd2020ghana1<-crop(pd2020,ghanamap)
+pd2020ghana<-mask(pd2020ghana1,ghanamap)
+plot(pd2020ghana)
+
 #Choose a species #Pterocarpus erinaceus
 pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pterocarpus erinaceus',]
 
+
+
+
 #Basic MaxEnt with two predictors
+library(rJava)
+dat=pteeri@data
 m1<-maxent(ghana1[[c(4,16)]],pteeri)
 m1#View output as html
 #Predict habitat suitability for the species
@@ -134,12 +175,10 @@ levelplot(p1,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=
 #Bias file (to take account of sampling bias)
 densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
 densgbifrecs_ras <- raster(densgbifrecs)
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
 
 bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.points(Sp.Points(bg_BC)))
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.points(Sp.Points(bg_BC)))
 
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -156,12 +195,11 @@ maxentfull<-maxent(ghana1[[c(4,16)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5',
 maxentfull
 maxentfull@results #Note AUC
 pfull<-predict(maxentfull,ghana1)                   
-levelplot(pfull,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
+levelplot(pfull,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
 maxentwrite<-maxent(ghana1[[c(4,16)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5','threshold=FALSE','product=FALSE',"-P","-J"),
-                    path='S:\\Supervision\\Sarah\\ExampleMaxEnt')
+                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
 
 
