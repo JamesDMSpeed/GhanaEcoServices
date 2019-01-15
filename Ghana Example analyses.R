@@ -105,7 +105,7 @@ pairs(ghana1[[c(4,7,12,13,16,17,19)]])
 #Use Bio4 and BIo16 (Temp seasonality and precipitation of wettest quarter)
 
 #Landcover data
-install.packages("rgdal")
+#install.packages("rgdal")
 lc1975<-raster('Landcover maps/west_africa_land-use_land-cover_1975_2km/swa_1975lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc1975))
 ghanalc1975<-mask(crop(lc1975,ghanat),ghanat)
@@ -175,6 +175,7 @@ pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pteroc
 levels(GhanaUses$Species)
 levels(GhanaUses$Category)
 healthcare<-(GhanaUses$Category=='Health care')
+healthcare#Not a dataframe.
 
 #Basic MaxEnt with two predictors
 library(rJava)
@@ -208,6 +209,8 @@ levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+l
 tuneparameters<-ENMevaluate(pteeri@coords,ghana1[[c(4,16)]],method="block",bg.coords=bg_BC)
 
 tuneparameters<-ENMevaluate(pteeri@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="randomkfold",kfolds=3,bg.coords=bg_BC)
+tuneparameters<-ENMevaluate(pteeri@coords,ghana_envvars[[c(4,16,21)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)#Works without population data
+
 tuneparameters@results
 tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
 
