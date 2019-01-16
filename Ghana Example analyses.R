@@ -128,7 +128,7 @@ ghanalc2013<-mask(crop(lc2013,ghanat),ghanat)
 plot(ghanalc2013)
 levels(ghanalc2013)
 
-#Population data
+#Cropping Ghana from Global population density data
 pd2000<-raster('human population data/gpw2000_30_sec.tif')
 pd2000ghana1<-crop(pd2000,ghanamap)
 pd2000ghana<-mask(pd2000ghana1,ghanamap)
@@ -158,7 +158,8 @@ plot(pd2020ghana)
 popdat<-stack(pd2000ghana,pd2005ghana,pd2010ghana,pd2015ghana,pd2020ghana)
 #Resample to same grid as climate data
 popdatrs<-resample(popdat,ghana1,method="bilinear")
-
+writeRaster(popdatrs,'GhanaPopData')
+ghanapopdat<-stack('GhanaPopData')
 #Stack up lcdata
 lcdat<-stack(lc1975,lc2000,lc2013)
 #Project to same crs as climate data
@@ -166,7 +167,7 @@ lcdatp<-projectRaster(lcdat,ghana1,method="ngb")
 #Resample to same grid as climate data
 lcdatrs<-resample(lcdatp,ghana1,method="ngb")#Nearest neighbour as categorical
 
-ghana_envvars<-stack(ghana1,mask(popdatrs,ghana1[[1]]),mask(lcdatrs,ghana1[[1]]))
+ghana_envvars<-stack(ghana1,mask(ghanapopdat,ghana1[[1]]),mask(lcdatrs,ghana1[[1]]))
 
 #Choose a species #Pterocarpus erinaceus
 pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pterocarpus erinaceus',]
