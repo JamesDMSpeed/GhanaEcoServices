@@ -199,18 +199,23 @@ levelplot(p1,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=
 #Extensions
 #Bias file (to take account of sampling bias)
 densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras <- raster(densgbifrecs)
+densgbifrecs_ras1 <- raster(densgbifrecs)
+#Make sure density layer has same resolution and extent as env. data
+densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
+
 levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
 
 bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.points(Sp.Points(bg_BC)))
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(SpatialPoints(bg_BC)))
 
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters<-ENMevaluate(pteeri@coords,ghana1[[c(4,16)]],method="block",bg.coords=bg_BC)
 
-tuneparameters<-ENMevaluate(pteeri@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="randomkfold",kfolds=3,bg.coords=bg_BC)
-tuneparameters<-ENMevaluate(pteeri@coords,ghana_envvars[[c(4,16,21)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)#Works without population data
+tuneparameters<-ENMevaluate(pteeri@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters@results
 tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
@@ -220,22 +225,20 @@ tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other pa
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana1[[c(4,16)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5','threshold=FALSE','product=FALSE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],pteeri,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
-pfull<-predict(maxentfull,ghana1)
-
 pfull<-predict(maxentfull,ghana_envvars)
-levelplot(pfull,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
+
+levelplot(pfull,par.settings='rtheme',margin=F,main='Pterocarpus erinaceus',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(pteeri,col=1))
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxentwrite<-maxent(ghana_1[[c(4,16)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5','threshold=FALSE','product=FALSE',"-P","-J"),
-                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
+maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],pteeri,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
+                    path='ExampleMaxEnt')
 
-maxentwrite<-maxent(ghana_envvars[[c(4,16,20)]],pteeri,a=bg_BC,args=c('betamultiplier=1.5','threshold=FALSE','product=FALSE',"-P","-J"),
-                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
 
