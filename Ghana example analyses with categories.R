@@ -1,4 +1,5 @@
 #Ghana plants
+rm(list=ls())#Clean workspace
 #Install packages
 require(data.table)
 require(raster)
@@ -20,6 +21,8 @@ plot(dataSpatial, add=T)
 head(GhanaUses)
 summary(GhanaUses)
 
+#Read in eco services table
+GhanaUses<-fread('FinalDataSpeciesNames.csv',header=T)
 #Number of species
 length(levels(as.factor(GhanaUses$Species)))
 
@@ -176,14 +179,11 @@ pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pteroc
 #Using GhanaUses for maxent
 levels(GhanaUses$Species)
 levels(GhanaUses$Category)
-healthcare<-(GhanaUses$Category=='Health care')
-healthcare#Not a dataframe.
 
 #Merging health care with gbif recs to a data frame 
-healthcare_gbif<-gbifrecs[gbifrecs$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Health care'],]
+healthcare_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Health care']),]
 dim(healthcare_gbif)
-summary(healthcare_gbif)
-healthcare_gbif<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Health care']
+levels(droplevels(healthcare_gbif$species)) #Check this against the species in your table 
 
 
 #Basic MaxEnt with two predictors
