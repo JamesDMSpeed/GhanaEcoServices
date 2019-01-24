@@ -14,12 +14,6 @@ data<-data[!is.na(data$decimalLatitude),]
 coords <- cbind(data$decimalLongitude, data$decimalLatitude)
 ghana_species_pts <- SpatialPointsDataFrame(coords, data, proj4string = CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'))
 crs(dataSpatial)
-crs(ghanamap)
-
-plot(ghanamap)
-plot(dataSpatial, add=T)
-head(GhanaUses)
-summary(GhanaUses)
 
 #Read in eco services table
 GhanaUses<-fread('FinalDataSpeciesNames.csv',header=T)
@@ -31,6 +25,13 @@ Ghana_Species<-GhanaUses[GhanaUses$Species!="",]
 #Ghana_Species<-GhanaUses[!is.na(GhanaUses$Species),]
 View(Ghana_Species)
 
+# #GBIF records
+# #Read directly from zip directory
+# gbifrecs<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
+# head(gbifrecs)
+# summary(gbifrecs)
+# dim(gbifrecs)
+
 #Make spatial point data frame
 Ghana_Species_pts<-SpatialPointsDataFrame(cbind(Ghana_Species$DecimalLongitude,Ghana_Species$DecimalLatitude),Ghana_Species,proj4string = CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0'))
 
@@ -39,11 +40,11 @@ ghanamap<-getData('GADM',country='GHA',level=1)
 plot(ghanamap)
 plot(dataSpatial, add=T)
 crs(ghanamap)
-points(Ghana_Species_pts,pch=16,cex=0.1,col='red') #Species occurence points
+points(ghana_Species_pts,pch=16,cex=0.1,col='red') #Species occurence points
 
 #Extract records outside of Ghana land (i.e. sea, other countries)
 ghana_species_pts_insidemap<-ghana_species_pts[ghanamap,]
-points(Ghana_species_pts_insidemap,cex=0.1,pch=16,col='blue')
+points(ghana_species_pts_insidemap,cex=0.1,pch=16,col='blue')
 legend('r',pch=16,col=c('red','blue'),c('Discarded records','Retained records'))
 
 #Dataset size
@@ -159,34 +160,34 @@ plot(pd2020ghana)
 
 #Stack up popdata
 popdat<-stack(pd2000ghana,pd2005ghana,pd2010ghana,pd2015ghana,pd2020ghana)
+
 #Resample to same grid as climate data
 popdatrs<-resample(popdat,ghana1,method="bilinear")
 writeRaster(popdatrs,'GhanaPopData')
 ghanapopdat<-stack('GhanaPopData')
+
 #Stack up lcdata
 lcdat<-stack(lc1975,lc2000,lc2013)
+
 #Project to same crs as climate data
 lcdatp<-projectRaster(lcdat,ghana1,method="ngb")
+
 #Resample to same grid as climate data
 lcdatrs<-resample(lcdatp,ghana1,method="ngb")#Nearest neighbour as categorical
 
 ghana_envvars<-stack(ghana1,mask(ghanapopdat,ghana1[[1]]),mask(lcdatrs,ghana1[[1]]))
 
-#Choose a species #Pterocarpus erinaceus
-pteeri<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Pterocarpus erinaceus',]
-
-
-#Using GhanaUses for maxent
-levels(GhanaUses$Species)
-levels(GhanaUses$Category)
-
 #Merging health care with gbif recs to a data frame 
 healthcare_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Health care']),]
 dim(healthcare_gbif)
 levels(droplevels(healthcare_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Health care"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Health care"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Health care"])))
+gbifhcsp<-levels(droplevels(healthcare_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
-
-#Basic MaxEnt with two predictors
+#Basic MaxEnt with two predictors for Health care
 library(rJava)
 dat=healthcare_gbif@data
 m1<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
@@ -205,6 +206,7 @@ levelplot(p1,par.settings='rtheme',margin=F,main='Health care',scales=list(draw=
 #Bias file (to take account of sampling bias)
 densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
 densgbifrecs_ras1 <- raster(densgbifrecs)
+
 #Make sure density layer has same resolution and extent as env. data
 densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
 
@@ -218,10 +220,9 @@ levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
 
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
-
 tuneparameters<-ENMevaluate(healthcare_gbif@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
-tuneparameters@results
+ tuneparameters@results
 tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
 
 #With response curves, tuned parameterisation and bias file
@@ -229,7 +230,6 @@ tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other pa
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-
 maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
 
 maxentfull
@@ -246,18 +246,18 @@ maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,facto
                     path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
 
 #Doing same for other categories
-#Using GhanaUses for maxent
-levels(GhanaUses$Species)
-levels(GhanaUses$Category)
-agriculture<-(GhanaUses$Category=='Agriculture')
 
-#Merging agriculture with gbif recs to a data frame 
-agricult_gbif<-gbifrecs[gbifrecs$species%in%speciesdata1$ConfirmedSppNames[speciesdata1$Category=='Agriculture'],]
+#Merging agriculture with gbif recs to a data frame
+agricult_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Agriculture']),]
 dim(agricult_gbif)
-summary(agricult_gbif)
-agricult_gbif<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Agriculture']
+levels(droplevels(agricult_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Agriculture"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Agriculture"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Agriculture"])))
+gbifhcsp<-levels(droplevels(agricult_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
-#Basic MaxEnt with two predictors
+#Basic MaxEnt with two predictors for Agriculture
 library(rJava)
 dat=agricult_gbif@data
 m1<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
@@ -318,15 +318,17 @@ maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,a=bg_BC,factors
 
 
 
-purification<-(GhanaUses$Category=='Water purification')
-
-#Merging construction with gbif recs to a data frame 
-purif_gbif<-gbifrecs[gbifrecs$species%in%speciesdata1$ConfirmedSppNames[speciesdata1$Category=='Water purification'],]
+#Merging water purification with gbif recs to a data frame 
+purif_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Water purification']),]
 dim(purif_gbif)
-summary(purif_gbif)
-purif_gbif<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Water purification']
+levels(droplevels(purif_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Water purification"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Water purificaion"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Water purification"])))
+gbifhcsp<-levels(droplevels(purif_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
-#Basic MaxEnt with two predictors
+#Basic MaxEnt with two predictors for Water purifiction
 library(rJava)
 dat=purif_gbif@data
 m1<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
@@ -386,15 +388,17 @@ maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,factors="s
                     path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
 
 
-construct<-(GhanaUses$Category=='Construction')
-
-#Merging construction with gbif recs to a data frame 
-construct_gbif<-gbifrecs[gbifrecs$species%in%speciesdata1$ConfirmedSppNames[speciesdata1$Category=='Construction'],]
+#Merging construction with gbif recs to a data frame
+construct_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Construction']),]
 dim(construct_gbif)
-summary(construct_gbif)
-construct_gbif<-ghana_species_pts_insidemap[ghana_species_pts_insidemap$species=='Construction']
+levels(droplevels(construct_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Construction"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Construction"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Construction"])))
+gbifhcsp<-levels(droplevels(construct_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
-#Basic MaxEnt with two predictors
+#Basic MaxEnt with two predictors for Construction
 library(rJava)
 dat=construct_gbif@data
 m1<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
@@ -451,4 +455,287 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Construction',scales=list(d
 
 #Write maxent results to file which you can later read in to make response curves etc in R
 maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
+                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
+
+
+#Merging social with gbif recs to a data frame
+social_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Social']),]
+dim(social_gbif)
+levels(droplevels(social_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Social"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Social"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Social"])))
+gbifhcsp<-levels(droplevels(social_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
+
+#Basic MaxEnt with two predictors for social
+library(rJava)
+dat=social_gbif@data
+m1<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
+m1#View output as html
+
+#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
+rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
+levelplot(p1,par.settings='rtheme',margin=F,main='Social',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))
+
+
+# More complex and proper application of maxent ---------------------------
+
+#Extensions
+#Bias file (to take account of sampling bias)
+densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
+densgbifrecs_ras1 <- raster(densgbifrecs)
+
+#Make sure density layer has same resolution and extent as env. data
+densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
+
+bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(SpatialPoints(bg_BC)))
+
+#Tuning #Note this takes a while to estimate
+#Use block or checkerboard methods for tuning spatially variable data
+
+tuneparameters<-ENMevaluate(social_gbif@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+
+tuneparameters@results
+tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
+
+#With response curves, tuned parameterisation and bias file
+#-P turns on response curves
+#-J turns on jackknifing
+#Betamultiplier to 4 and threshold features off
+#a gives background data
+
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+
+maxentfull
+maxentfull@results #Note AUC
+pfull<-predict(maxentfull,ghana_envvars)
+
+levelplot(pfull,par.settings='rtheme',margin=F,main='Social',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(social_gbif,col=1))
+
+
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
+                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
+
+
+#Merging energy with gbif recs to a data frame 
+energy_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Energy']),]
+dim(energy_gbif)
+levels(droplevels(energy_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Energy"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Energy"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Energy"])))
+gbifhcsp<-levels(droplevels(energy_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
+
+#Basic MaxEnt with two predictors for energy
+library(rJava)
+dat=energy_gbif@data
+m1<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
+m1#View output as html
+
+#Predict habitat suitability for the species
+p1<-predict(m1,ghana_envvars)
+rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
+levelplot(p1,par.settings='rtheme',margin=F,main='Energy',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))
+
+
+# More complex and proper application of maxent ---------------------------
+
+#Extensions
+#Bias file (to take account of sampling bias)
+densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
+densgbifrecs_ras1 <- raster(densgbifrecs)
+#Make sure density layer has same resolution and extent as env. data
+densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
+
+bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(SpatialPoints(bg_BC)))
+
+#Tuning #Note this takes a while to estimate
+#Use block or checkerboard methods for tuning spatially variable data
+
+tuneparameters<-ENMevaluate(energy_gbif@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+
+tuneparameters@results
+tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
+
+#With response curves, tuned parameterisation and bias file
+#-P turns on response curves
+#-J turns on jackknifing
+#Betamultiplier to 4 and threshold features off
+#a gives background data
+
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+
+maxentfull
+maxentfull@results #Note AUC
+pfull<-predict(maxentfull,ghana_envvars)
+
+levelplot(pfull,par.settings='rtheme',margin=F,main='Energy',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(energy_gbif,col=1))
+
+
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
+                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
+
+
+#Merging food and nutrition with gbif recs to a data frame
+foodnutr_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Food and nutrition']),]
+dim(foodnutr_gbif)
+levels(droplevels(foodnutr_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Food and nutrition"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Food and nutrition"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Food and nutrition"])))
+gbifhcsp<-levels(droplevels(foodnutr_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
+
+#Basic MaxEnt with two predictors for Food and nutrition
+library(rJava)
+dat=foodnutr_gbif@data
+m1<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
+m1#View output as html
+
+#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
+rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
+levelplot(p1,par.settings='rtheme',margin=F,main='Food and nutrition',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))
+
+
+# More complex and proper application of maxent ---------------------------
+
+#Extensions
+#Bias file (to take account of sampling bias)
+densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
+densgbifrecs_ras1 <- raster(densgbifrecs)
+
+#Make sure density layer has same resolution and extent as env. data
+densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
+
+bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(SpatialPoints(bg_BC)))
+
+#Tuning #Note this takes a while to estimate
+#Use block or checkerboard methods for tuning spatially variable data
+
+tuneparameters<-ENMevaluate(foodnutr_gbif@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+
+tuneparameters@results
+tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
+
+#With response curves, tuned parameterisation and bias file
+#-P turns on response curves
+#-J turns on jackknifing
+#Betamultiplier to 4 and threshold features off
+#a gives background data
+
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+
+maxentfull
+maxentfull@results #Note AUC
+pfull<-predict(maxentfull,ghana_envvars)
+
+levelplot(pfull,par.settings='rtheme',margin=F,main='Food and nutrition',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(foodnutr_gbif,col=1))
+
+
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
+                    path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
+
+
+
+#Merging Culture with gbif recs to a data frame 
+cultur_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Culture']),]
+dim(cultur_gbif)
+levels(droplevels(cultur_gbif$species)) #Check this against the species in your table 
+length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Culture"]))))
+(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Culture"]))))
+ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Culture"])))
+gbifhcsp<-levels(droplevels(cultur_gbif$species)) 
+ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
+
+#Basic MaxEnt with two predictors for culture
+library(rJava)
+dat=cultur_gbif@data
+m1<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
+m1#View output as html
+
+#Predict habitat suitability for the species
+p1<-predict(m1,ghana_envvars)
+rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
+levelplot(p1,par.settings='rtheme',margin=F,main='Culture',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))
+
+
+# More complex and proper application of maxent ---------------------------
+
+#Extensions
+#Bias file (to take account of sampling bias)
+densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
+densgbifrecs_ras1 <- raster(densgbifrecs)
+#Make sure density layer has same resolution and extent as env. data
+densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
+
+bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
+
+levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(SpatialPoints(bg_BC)))
+
+#Tuning #Note this takes a while to estimate
+#Use block or checkerboard methods for tuning spatially variable data
+
+tuneparameters<-ENMevaluate(cultur_gbif@coords,ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+
+
+tuneparameters@results
+tuneparameters@results[which.min(tuneparameters@results$AICc),]#Can use other parameters to select best method
+
+#With response curves, tuned parameterisation and bias file
+#-P turns on response curves
+#-J turns on jackknifing
+#Betamultiplier to 4 and threshold features off
+#a gives background data
+
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+
+
+maxentfull
+maxentfull@results #Note AUC
+pfull<-predict(maxentfull,ghana_envvars)
+
+levelplot(pfull,par.settings='rtheme',margin=F,main='Culture',scales=list(draw=F),xlab=NULL,ylab=NULL)+
+  layer(sp.polygons(ghanamap))+
+  layer(sp.points(energy_gbif,col=1))
+
+
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxentwrite<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"),
                     path='C:/Users/saray/Sarah/MASTERS PROJECT/GhanaEcoServices1/ExampleMaxEnt')
