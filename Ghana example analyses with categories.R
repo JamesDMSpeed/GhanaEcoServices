@@ -262,6 +262,7 @@ maxent_healthcare<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,
 
 #Doing same for other categories
 
+
 #Merging agriculture with gbif recs to a data frame
 agricult_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Agriculture']),]
 dim(agricult_gbif)
@@ -1206,7 +1207,8 @@ levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_fever<-ENMevaluate(fev@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC,
+                                  algorithm='maxent.jar')
 
 tuneparameters_fever@results
 tuneparameters_fever@results[which.min(tuneparameters_fever@results$AICc),]#Can use other parameters to select best method
