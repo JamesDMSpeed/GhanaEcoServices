@@ -1381,6 +1381,18 @@ maxent_infertility<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,
                                    args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
                                    path='MaxEntOutput/Infertility')
 
+#Example with switches for LQHPT
+maxent_infertility<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,
+                                  factors="swa_2000lulc_2km",
+                                  args=c('betamultiplier=1.0',
+                                         'linear=TRUE',
+                                         'quadratic=TRUE',
+                                         'hinge=TRUE',
+                                         'threshold=TRUE',
+                                         'product=TRUE',
+                                         "-P","-J","replicates=5"),
+                                  path='MaxEntOutput/Infertility')
+
 
 #Merging Malaria species with Gbif records
 mal<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Malaria']),]
