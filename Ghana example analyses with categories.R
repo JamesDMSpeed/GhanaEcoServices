@@ -231,7 +231,7 @@ levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_healthcare<-ENMevaluate(healthcare_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                       ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_healthcare@results
 tuneparameters_healthcare@results[which.min(tuneparameters_healthcare@results$AICc),]#Can use other parameters to select best method
@@ -243,7 +243,7 @@ tp_healthcare<-readRDS("tuneparameters_Health care")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -255,13 +255,19 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Health care',scales=list(dr
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_healthcare<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,
-                    factors="swa_2000lulc_2km",
-                    args=c('betamultiplier=2.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                    path='MaxEntOutput/HealthCare')
+maxent_healthcare<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC,
+                          factors="swa_2000lulc_2km",
+                          args=c('betamultiplier=0.5',
+                                 'linear=TRUE',
+                                 'quadratic=TRUE',
+                                 'hinge=FALSE',
+                                 'threshold=FALSE',
+                                 'product=FALSE',
+                                 "-P","-J","replicates=5"),
+                          path='MaxEntOutput/Health care')
+
 
 #Doing same for other categories
-
 
 #Merging agriculture with gbif recs to a data frame
 agricult_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Agriculture']),]
@@ -274,40 +280,11 @@ gbifagrsp<-levels(droplevels(agricult_gbif$species))
 ecosysagrsp[which(ecosysagrsp%in%gbifagrsp==F)]
 
 #Basic MaxEnt with two predictors for Agriculture
-library(rJava)
-dat=agricult_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Agriculture',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_agriculture<-ENMevaluate(agricult_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                        ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_agriculture@results
 tuneparameters_agriculture@results[which.min(tuneparameters_agriculture@results$AICc),]#Can use other parameters to select best method
@@ -321,7 +298,7 @@ tp_agriculture<-readRDS("tuneparameters_Agriculture")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -333,12 +310,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Agriculture',scales=list(dr
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_agriculture<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,a=bg_BC,
-                                  factors="swa_2000lulc_2km",
-                                  args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"),
-                                  path='MaxEntOutput/Agriculture')
-
-
+maxent_agriculture<-maxent(ghana_envvars[[c(4,16,20,26)]],agricult_gbif,a=bg_BC,
+                           factors="swa_2000lulc_2km",
+                           args=c('betamultiplier=0.5',
+                                  'linear=TRUE',
+                                  'quadratic=TRUE',
+                                  'hinge=FALSE',
+                                  'threshold=FALSE',
+                                  'product=FALSE',
+                                  "-P","-J","replicates=5"),
+                           path='MaxEntOutput/Agriculture')
 
 #Merging water purification with gbif recs to a data frame 
 purif_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Water purification']),]
@@ -351,40 +332,11 @@ gbifpursp<-levels(droplevels(purif_gbif$species))
 ecosyspursp[which(ecosyspursp%in%gbifpursp==F)]
 
 #Basic MaxEnt with two predictors for Water purifiction
-library(rJava)
-dat=purif_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Water purification',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_purification<-ENMevaluate(purif_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                         ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_purification@results
 tuneparameters_purification@results[which.min(tuneparameters_purification@results$AICc),]#Can use other parameters to select best method
@@ -397,7 +349,7 @@ tp_purification<-readRDS("tuneparameters_Water purification")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.5','threshold=FALSE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=TRUE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -409,10 +361,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Water purification',scales=
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_purification<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=3.5','threshold=FALSE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Water purification')
+maxent_purification<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,
+                            factors="swa_2000lulc_2km",
+                            args=c('betamultiplier=4.0',
+                                   'linear=TRUE',
+                                   'quadratic=TRUE',
+                                   'hinge=TRUE',
+                                   'threshold=FALSE',
+                                   'product=TRUE',
+                                   "-P","-J","replicates=5"),
+                            path='MaxEntOutput/Water purification')
+
 
 #Merging construction with gbif recs to a data frame
 construct_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Construction']),]
@@ -425,40 +384,11 @@ gbifconssp<-levels(droplevels(construct_gbif$species))
 ecosysconssp[which(ecosysconssp%in%gbifconssp==F)]
 
 #Basic MaxEnt with two predictors for Construction
-library(rJava)
-dat=construct_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Construction',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_construction<-ENMevaluate(construct_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                         ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_construction@results
 tuneparameters_construction@results[which.min(tuneparameters_construction@results$AICc),]#Can use other parameters to select best method
@@ -471,7 +401,7 @@ tp_construction<-readRDS("tuneparameters_Construction")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -483,10 +413,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Construction',scales=list(d
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_construction<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Construction')
+maxent_construction<-maxent(ghana_envvars[[c(4,16,20,26)]],construct_gbif,a=bg_BC,
+                            factors="swa_2000lulc_2km",
+                            args=c('betamultiplier=0.5',
+                                   'linear=TRUE',
+                                   'quadratic=TRUE',
+                                   'hinge=FALSE',
+                                   'threshold=FALSE',
+                                   'product=FALSE',
+                                   "-P","-J","replicates=5"),
+                            path='MaxEntOutput/Construction')
 
 
 #Merging social with gbif recs to a data frame
@@ -500,40 +436,11 @@ gbifsocsp<-levels(droplevels(social_gbif$species))
 ecosyssocsp[which(ecosyssocsp%in%gbifsocsp==F)]
 
 #Basic MaxEnt with two predictors for social
-library(rJava)
-dat=social_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Social',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_social<-ENMevaluate(social_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                   ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_social@results
 tuneparameters_social@results[which.min(tuneparameters_social@results$AICc),]#Can use other parameters to select best methodsaveRDS(tuneparameters_social,file = "tuneparameters_Social")
@@ -545,7 +452,7 @@ tp_social<-readRDS("tuneparameters_Social")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=TRUE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -556,11 +463,19 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Social',scales=list(draw=F)
   layer(sp.points(social_gbif,col=1))
 
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_social<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Social')
+maxent_social<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,
+                      factors="swa_2000lulc_2km",
+                      args=c('betamultiplier=4.0',
+                             'linear=TRUE',
+                             'quadratic=TRUE',
+                             'hinge=TRUE',
+                             'threshold=FALSE',
+                             'product=TRUE',
+                             "-P","-J","replicates=5"),
+                      path='MaxEntOutput/Social')
+
 
 #Merging energy with gbif recs to a data frame 
 energy_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Energy']),]
@@ -573,40 +488,11 @@ gbifensp<-levels(droplevels(energy_gbif$species))
 ecosysensp[which(ecosysensp%in%gbifensp==F)]
 
 #Basic MaxEnt with two predictors for energy
-library(rJava)
-dat=energy_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Energy',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_energy<-ENMevaluate(energy_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                   ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_energy@results
 tuneparameters_energy@results[which.min(tuneparameters_energy@results$AICc),]#Can use other parameters to select best method
@@ -619,7 +505,7 @@ tp_energy<-readRDS("tuneparameters_Energy")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -631,11 +517,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Energy',scales=list(draw=F)
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_energy<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Energy')
-
+maxent_energy<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,
+                      factors="swa_2000lulc_2km",
+                      args=c('betamultiplier=4.0',
+                             'linear=FALSE',
+                             'quadratic=FALSE',
+                             'hinge=TRUE',
+                             'threshold=FALSE',
+                             'product=FALSE',
+                             "-P","-J","replicates=5"),
+                      path='MaxEntOutput/Energy')
 
 #Merging food and nutrition with gbif recs to a data frame
 foodnutr_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Food and nutrition']),]
@@ -648,40 +539,11 @@ gbiffnsp<-levels(droplevels(foodnutr_gbif$species))
 ecosysfnsp[which(ecosysfnsp%in%gbiffnsp==F)]
 
 #Basic MaxEnt with two predictors for Food and nutrition
-library(rJava)
-dat=foodnutr_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the speciesp1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Food and nutrition',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_foodnutrition<-ENMevaluate(foodnutr_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                          ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_foodnutrition@results
 tuneparameters_foodnutrition@results[which.min(tuneparameters_foodnutrition@results$AICc),]#Can use other parameters to select best method
@@ -694,7 +556,7 @@ tp_healthcare<-readRDS("tuneparameters_Food and nutrition")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -706,10 +568,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Food and nutrition',scales=
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_foodnutrition<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Food and nutrition')
+maxent_foodnutrition<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_BC,
+                             factors="swa_2000lulc_2km",
+                             args=c('betamultiplier=0.5',
+                                    'linear=TRUE',
+                                    'quadratic=TRUE',
+                                    'hinge=FALSE',
+                                    'threshold=FALSE',
+                                    'product=FALSE',
+                                    "-P","-J","replicates=5"),
+                             path='MaxEntOutput/Food and nutrition')
 
 
 #Merging Culture with gbif recs to a data frame 
@@ -723,40 +591,11 @@ gbifculsp<-levels(droplevels(cultur_gbif$species))
 ecosysculsp[which(ecosysculsp%in%gbifculsp==F)]
 
 #Basic MaxEnt with two predictors for culture
-library(rJava)
-dat=cultur_gbif@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Culture',scales=list(draw=F),xlab=NULL,ylab=NULL)+
-  layer(sp.polygons(ghanamap))
-
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 
 tuneparameters_culture<-ENMevaluate(cultur_gbif@coords,
-                                       ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                    ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 
 tuneparameters_culture@results
@@ -770,7 +609,7 @@ tp_culture<-readRDS("tuneparameters_Culture")
 #Betamultiplier to 4 and threshold features off
 #a gives background data
 
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 
 maxentfull
@@ -783,11 +622,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Culture',scales=list(draw=F
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_culture<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,
-                                 factors="swa_2000lulc_2km",
-                                 args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                 path='MaxEntOutput/Culture')
-
+maxent_culture<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,
+                       factors="swa_2000lulc_2km",
+                       args=c('betamultiplier=3.5',
+                              'linear=FALSE',
+                              'quadratic=FALSE',
+                              'hinge=TRUE',
+                              'threshold=FALSE',
+                              'product=FALSE',
+                              "-P","-J","replicates=5"),
+                       path='MaxEntOutput/Culture')
 
 
 
@@ -799,7 +643,6 @@ with(droplevels(speciesdata[speciesdata$Group=='Medicine: Anaesthetics',]),tappl
 
 
 #MaxEnt modelling of groups within health care category
-
 #Merging Anaesthetics species with Gbif records
 anaesth<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Anaesthetics']),]
 dim(anaesth)
@@ -812,38 +655,10 @@ gbifansp<-levels(droplevels(anaesth$species))
 ecosysansp[which(ecosysansp%in%gbifansp==F)]
 
 #Basic MaxEnt with two predictors for Anaesthetics
-library(rJava)
-dat=anaesth@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],anaesth,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Anaesthetics',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_anaesthetics<-ENMevaluate(anaesth@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                         ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_anaesthetics@results
 tuneparameters_anaesthetics@results[which.min(tuneparameters_anaesthetics@results$AICc),]#Can use other parameters to select best method
@@ -855,7 +670,7 @@ tp_anaesthetics<-readRDS("tuneparameters_Anaesthetics")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],anaesth,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],anaesth,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -865,15 +680,21 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Anaesthetics',scales=list(d
   layer(sp.polygons(ghanamap))+
   layer(sp.points(anaesth,col=1))
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_anaesthetics<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],anaesth,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Anaesthetics')
+maxent_anaesthetics<-maxent(ghana_envvars[[c(4,16,20,26)]],anaesth,a=bg_BC,
+                            factors="swa_2000lulc_2km",
+                            args=c('betamultiplier=0.5',
+                                   'linear=TRUE',
+                                   'quadratic=TRUE',
+                                   'hinge=FALSE',
+                                   'threshold=FALSE',
+                                   'product=FALSE',
+                                   "-P","-J","replicates=5"),
+                            path='MaxEntOutput/Anaesthetics')
 
 
 #Do same with other groups
-
 #Merging Dentistry species with Gbif records
 dent<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Dentistry']),]
 dim(dent)
@@ -886,38 +707,10 @@ gbifdentsp<-levels(droplevels(dent$species))
 ecosysdentsp[which(ecosysdentsp%in%gbifdentsp==F)]
 
 #Basic MaxEnt with two predictors for Dentistry
-library(rJava)
-dat=dent@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Dentistry',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_dentistry<-ENMevaluate(dent@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                      ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_dentistry@results
 tuneparameters_dentistry@results[which.min(tuneparameters_dentistry@results$AICc),]#Can use other parameters to select best method
@@ -929,7 +722,7 @@ tp_dentistry<-readRDS("tuneparameters_Dentistry")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -939,11 +732,18 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Dentistry',scales=list(draw
   layer(sp.polygons(ghanamap))+
   layer(sp.points(dent,col=1))
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_dentistry<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Dentistry')
+maxent_dentistry<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,
+                         factors="swa_2000lulc_2km",
+                         args=c('betamultiplier=3.5',
+                                'linear=FALSE',
+                                'quadratic=FALSE',
+                                'hinge=TRUE',
+                                'threshold=FALSE',
+                                'product=FALSE',
+                                "-P","-J","replicates=5"),
+                         path='MaxEntOutput/Dentistry')
 
 
 
@@ -959,38 +759,10 @@ gbifdermsp<-levels(droplevels(derm$species))
 ecosysdermsp[which(ecosysdermsp%in%gbifdermsp==F)]
 
 #Basic MaxEnt with two predictors for Dermatology
-library(rJava)
-dat=derm@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Dermatology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_dermatology<-ENMevaluate(derm@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                        ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_dermatology@results
 tuneparameters_dermatology@results[which.min(tuneparameters_dermatology@results$AICc),]#Can use other parameters to select best method
@@ -1002,7 +774,7 @@ tp_dermatology<-readRDS("tuneparameters_Dermatology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1012,12 +784,18 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Dermatology',scales=list(dr
   layer(sp.polygons(ghanamap))+
   layer(sp.points(derm,col=1))
 
-#Write maxent results to file which you can later read in to make response curves etc in R
-maxent_dermatology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=4.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Dermatology')
 
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxent_dermatology<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,a=bg_BC,
+                           factors="swa_2000lulc_2km",
+                           args=c('betamultiplier=0.5',
+                                  'linear=TRUE',
+                                  'quadratic=TRUE',
+                                  'hinge=FALSE',
+                                  'threshold=FALSE',
+                                  'product=FALSE',
+                                  "-P","-J","replicates=5"),
+                           path='MaxEntOutput/Dermatology')
 
 
 #Merging Endocrinology species with Gbif records
@@ -1032,38 +810,10 @@ gbifendosp<-levels(droplevels(endo$species))
 ecosysendosp[which(ecosysendosp%in%gbifendosp==F)]
 
 #Basic MaxEnt with two predictors for Endocrinology
-library(rJava)
-dat=endo@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Endocrinology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_endocrinology<-ENMevaluate(endo@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                          ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_endocrinology@results
 tuneparameters_endocrinology@results[which.min(tuneparameters_endocrinology@results$AICc),]#Can use other parameters to select best method
@@ -1075,7 +825,7 @@ tp_endocrinology<-readRDS("tuneparameters_Endocrinology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1086,10 +836,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Endocrinology',scales=list(
   layer(sp.points(endo,col=1))
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_endocrinology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Endocrinology')
+maxent_endocrinology<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,a=bg_BC,
+                             factors="swa_2000lulc_2km",
+                             args=c('betamultiplier=0.5',
+                                    'linear=TRUE',
+                                    'quadratic=TRUE',
+                                    'hinge=FALSE',
+                                    'threshold=FALSE',
+                                    'product=FALSE',
+                                    "-P","-J","replicates=5"),
+                             path='MaxEntOutput/Endocrinology')
 
 
 #Merging Excipients species with Gbif records
@@ -1104,38 +860,10 @@ gbifexcisp<-levels(droplevels(exci$species))
 ecosysexcisp[which(ecosysexcisp%in%gbifexcisp==F)]
 
 #Basic MaxEnt with two predictors for Excipients
-library(rJava)
-dat=exci@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Excipients',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_excipients<-ENMevaluate(exci@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                       ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_excipients@results
 tuneparameters_excipients@results[which.min(tuneparameters_excipients@results$AICc),]#Can use other parameters to select best method
@@ -1147,7 +875,7 @@ tp_excipients<-readRDS("tuneparameters_Excipients")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.0','threshold=FALSE','product=TRUE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1157,11 +885,18 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Excipients',scales=list(dra
   layer(sp.polygons(ghanamap))+
   layer(sp.points(exci,col=1))
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_excipients<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=0.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Excipients')
+maxent_excipients<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,a=bg_BC,
+                          factors="swa_2000lulc_2km",
+                          args=c('betamultiplier=3.0',
+                                 'linear=TRUE',
+                                 'quadratic=TRUE',
+                                 'hinge=TRUE',
+                                 'threshold=FALSE',
+                                 'product=TRUE',
+                                 "-P","-J","replicates=5"),
+                          path='MaxEntOutput/Excipients')
 
 
 #Merging Fever species with Gbif records
@@ -1176,41 +911,12 @@ gbiffevsp<-levels(droplevels(fev$species))
 ecosysfevsp[which(ecosysfevsp%in%gbiffevsp==F)]
 
 #Basic MaxEnt with two predictors for Fever
-library(rJava)
-dat=fev@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Fever',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_fever<-ENMevaluate(fev@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC,
-                                  algorithm='maxent.jar')
+                                  ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
-tuneparameters_fever@results
+tuneparameters_fever@results                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 tuneparameters_fever@results[which.min(tuneparameters_fever@results$AICc),]#Can use other parameters to select best method
 saveRDS(tuneparameters_fever,file = "tuneparameters_Fever")
 tp_fever<-readRDS("tuneparameters_Fever")
@@ -1220,7 +926,7 @@ tp_fever<-readRDS("tuneparameters_Fever")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1230,12 +936,18 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Fever',scales=list(draw=F),
   layer(sp.polygons(ghanamap))+
   layer(sp.points(fev,col=1))
 
-#Write maxent results to file which you can later read in to make response curves etc in R
-maxent_fever<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Fever')
 
+#Write maxent results to file which you can later read in to make response curves etc in R
+maxent_fever<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,a=bg_BC,
+                     factors="swa_2000lulc_2km",
+                     args=c('betamultiplier=4.0',
+                            'linear=TRUE',
+                            'quadratic=TRUE',
+                            'hinge=FALSE',
+                            'threshold=FALSE',
+                            'product=FALSE',
+                            "-P","-J","replicates=5"),
+                     path='MaxEntOutput/Fever')
 
 #Merging Immunology species with Gbif records
 immu<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Immunology']),]
@@ -1249,38 +961,10 @@ gbifimmusp<-levels(droplevels(immu$species))
 ecosysimmusp[which(ecosysimmusp%in%gbifimmusp==F)]
 
 #Basic MaxEnt with two predictors for Immunology
-library(rJava)
-dat=immu@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Immunology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_immunology<-ENMevaluate(immu@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                       ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_immunology@results
 tuneparameters_immunology@results[which.min(tuneparameters_immunology@results$AICc),]#Can use other parameters to select best method
@@ -1292,7 +976,7 @@ tp_immunology<-readRDS("tuneparameters_immunology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1302,11 +986,18 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Immunology',scales=list(dra
   layer(sp.polygons(ghanamap))+
   layer(sp.points(immu,col=1))
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_immunology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Immunology')
+maxent_immunology<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,a=bg_BC,
+                          factors="swa_2000lulc_2km",
+                          args=c('betamultiplier=3.5',
+                                 'linear=FALSE',
+                                 'quadratic=FALSE',
+                                 'hinge=TRUE',
+                                 'threshold=FALSE',
+                                 'product=FALSE',
+                                 "-P","-J","replicates=5"),
+                          path='MaxEntOutput/Immunology')
 
 
 #Merging Infertility species with Gbif records
@@ -1321,38 +1012,10 @@ gbifinfersp<-levels(droplevels(infer$species))
 ecosysinfersp[which(ecosysinfersp%in%gbifinfersp==F)]
 
 #Basic MaxEnt with two predictors for Infertility
-library(rJava)
-dat=infer@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Infertility',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_infertility<-ENMevaluate(infer@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                        ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_infertility@results
 tuneparameters_infertility@results[which.min(tuneparameters_infertility@results$AICc),]#Can use other parameters to select best method
@@ -1364,7 +1027,7 @@ tp_infertility<-readRDS("tuneparameters_Infertility")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 
 maxentfull
@@ -1376,23 +1039,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Infertility',scales=list(dr
   layer(sp.points(infer,col=1))
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_infertility<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Infertility')
-
 #Example with switches for LQHPT
 maxent_infertility<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,
-                                  factors="swa_2000lulc_2km",
-                                  args=c('betamultiplier=1.0',
-                                         'linear=TRUE',
-                                         'quadratic=TRUE',
-                                         'hinge=TRUE',
-                                         'threshold=TRUE',
-                                         'product=TRUE',
-                                         "-P","-J","replicates=5"),
-                                  path='MaxEntOutput/Infertility')
-
+                           factors="swa_2000lulc_2km",
+                           args=c('betamultiplier=4.0',
+                                  'linear=FALSE',
+                                  'quadratic=FALSE',
+                                  'hinge=TRUE',
+                                  'threshold=FALSE',
+                                  'product=FALSE',
+                                  "-P","-J","replicates=5"),
+                           path='MaxEntOutput/Infertility')
 
 #Merging Malaria species with Gbif records
 mal<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Malaria']),]
@@ -1406,38 +1063,10 @@ gbifmalsp<-levels(droplevels(mal$species))
 ecosysmalsp[which(ecosysmalsp%in%gbifmalsp==F)]
 
 #Basic MaxEnt with two predictors for Malaria
-library(rJava)
-dat=mal@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],mal,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Malaria',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_malaria<-ENMevaluate(mal@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                    ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_malaria@results
 tuneparameters_malaria@results[which.min(tuneparameters_malaria@results$AICc),]#Can use other parameters to select best method
@@ -1449,7 +1078,7 @@ tp_malaria<-readRDS("tuneparameters_Malaria")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],mal,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],mal,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1460,11 +1089,21 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Malaria',scales=list(draw=F
   layer(sp.points(mal,col=1))
 
 
+
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_malaria<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],mal,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Malaria')
+#Example with switches for LQHPT
+maxent_malaria<-maxent(ghana_envvars[[c(4,16,20,26)]],mal,a=bg_BC,
+                       factors="swa_2000lulc_2km",
+                       args=c('betamultiplier=2.5',
+                              'linear=TRUE',
+                              'quadratic=TRUE',
+                              'hinge=FALSE',
+                              'threshold=FALSE',
+                              'product=FALSE',
+                              "-P","-J","replicates=5"),
+                       path='MaxEntOutput/Malaria')
+
+
 
 #Merging Musculoskeletal and cardiology species with Gbif records
 muscar<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Musculoskeletal and cardiology']),]
@@ -1478,38 +1117,10 @@ gbifmuscarsp<-levels(droplevels(muscar$species))
 ecosysmuscarsp[which(ecosysmuscarsp%in%gbifmuscarsp==F)]
 
 #Basic MaxEnt with two predictors for Musculoskeletal and cardiology
-library(rJava)
-dat=muscar@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Musculoskeletal and cardiology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_muscardiology<-ENMevaluate(muscar@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                          ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_muscardiology@results
 tuneparameters_muscardiology@results[which.min(tuneparameters_muscardiology@results$AICc),]#Can use other parameters to select best method
@@ -1521,7 +1132,7 @@ tp_muscardiology<-readRDS("tuneparameters_Musculoskeletal and cardiology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.5','threshold=FALSE','product=FALSE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1533,10 +1144,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Musculoskeletal and cardiol
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_muscardiology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=3.5','threshold=FALSE','product=FALSE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Musculoskeletal and cardiology')
+#Example with switches for LQHPT
+maxent_muscardiology<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,
+                             factors="swa_2000lulc_2km",
+                             args=c('betamultiplier=2.0',
+                                    'linear=TRUE',
+                                    'quadratic=TRUE',
+                                    'hinge=TRUE',
+                                    'threshold=FALSE',
+                                    'product=FALSE',
+                                    "-P","-J","replicates=5"),
+                             path='MaxEntOutput/Musculoskeletal and cardiology')
 
 
 
@@ -1552,38 +1170,10 @@ gbifneurosp<-levels(droplevels(neuro$species))
 ecosysneurosp[which(ecosysneurosp%in%gbifneurosp==F)]
 
 #Basic MaxEnt with two predictors for Neurology
-library(rJava)
-dat=neuro@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],neuro,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Neurology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_neurology<-ENMevaluate(neuro@coords,
-                                          ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                      ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_neurology@results
 tuneparameters_neurology@results[which.min(tuneparameters_neurology@results$AICc),]#Can use other parameters to select best method
@@ -1595,7 +1185,7 @@ tp_neurology<-readRDS("tuneparameters_Neurology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=FALSE','product=FALSE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1607,10 +1197,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Neurology',scales=list(draw
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_neurology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],neuro,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=FALSE','product=FALSE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Neurology')
+
+maxent_neurology<-maxent(ghana_envvars[[c(4,16,20,26)]],neuro,a=bg_BC,
+                         factors="swa_2000lulc_2km",
+                         args=c('betamultiplier=2.5',
+                                'linear=TRUE',
+                                'quadratic=TRUE',
+                                'hinge=TRUE',
+                                'threshold=FALSE',
+                                'product=FALSE',
+                                "-P","-J","replicates=5"),
+                         path='MaxEntOutput/Neurology')
 
 
 
@@ -1626,38 +1223,10 @@ gbifoncosp<-levels(droplevels(onco$species))
 ecosysoncosp[which(ecosysoncosp%in%gbifoncosp==F)]
 
 #Basic MaxEnt with two predictors for Oncology
-library(rJava)
-dat=onco@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Oncology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_oncology<-ENMevaluate(onco@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                     ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_oncology@results
 tuneparameters_oncology@results[which.min(tuneparameters_oncology@results$AICc),]#Can use other parameters to select best method
@@ -1669,7 +1238,7 @@ tp_oncology<-readRDS("tuneparameters_Oncology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.5','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1681,10 +1250,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Oncology',scales=list(draw=
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_oncology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Oncology')
+maxent_oncology<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,a=bg_BC,
+                        factors="swa_2000lulc_2km",
+                        args=c('betamultiplier=2.5',
+                               'linear=TRUE',
+                               'quadratic=TRUE',
+                               'hinge=FALSE',
+                               'threshold=FALSE',
+                               'product=FALSE',
+                               "-P","-J","replicates=5"),
+                        path='MaxEntOutput/Oncology')
 
 
 #Merging Ophthalmology species with Gbif records
@@ -1699,38 +1274,10 @@ gbifophtsp<-levels(droplevels(opht$species))
 ecosysophtsp[which(ecosysophtsp%in%gbifophtsp==F)]
 
 #Basic MaxEnt with two predictors for Ophthalmology
-library(rJava)
-dat=opht@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Ophthalmology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_ophthalmology<-ENMevaluate(opht@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                          ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_ophthalmology@results
 tuneparameters_ophthalmology@results[which.min(tuneparameters_ophthalmology@results$AICc),]#Can use other parameters to select best method
@@ -1742,7 +1289,7 @@ tp_ophthalmology<-readRDS("tuneparameters_Ophthalmology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=FALSE','product=FALSE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=2.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1754,10 +1301,16 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Ophthalmology',scales=list(
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_ophthalmology<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=FALSE','product=FALSE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Ophthalmology')
+maxent_ophthalmology<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,a=bg_BC,
+                             factors="swa_2000lulc_2km",
+                             args=c('betamultiplier=2.0',
+                                    'linear=FALSE',
+                                    'quadratic=FALSE',
+                                    'hinge=TRUE',
+                                    'threshold=FALSE',
+                                    'product=FALSE',
+                                    "-P","-J","replicates=5"),
+                             path='MaxEntOutput/Ophthalmology')
 
 
 ortho<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Orthopaedics']),]
@@ -1771,38 +1324,10 @@ gbiforthosp<-levels(droplevels(ortho$species))
 ecosysorthosp[which(ecosysorthosp%in%gbiforthosp==F)]
 
 #Basic MaxEnt with two predictors for Orthopaedics
-library(rJava)
-dat=ortho@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Orthopaedics',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_orthopaedics<-ENMevaluate(ortho@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                         ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_orthopaedics@results
 tuneparameters_orthopaedics@results[which.min(tuneparameters_orthopaedics@results$AICc),]#Can use other parameters to select best method
@@ -1814,7 +1339,7 @@ tp_orthopaedics<-readRDS("tuneparameters_Orthopaedics")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1826,10 +1351,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Orthopaedics',scales=list(d
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_orthopaedics<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.5','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Orthopaedics')
+maxent_orthopaedics<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,a=bg_BC,
+                            factors="swa_2000lulc_2km",
+                            args=c('betamultiplier=3.0',
+                                   'linear=FALSE',
+                                   'quadratic=FALSE',
+                                   'hinge=TRUE',
+                                   'threshold=FALSE',
+                                   'product=FALSE',
+                                   "-P","-J","replicates=5"),
+                            path='MaxEntOutput/Orthopaedics')
+
 
 
 psyc<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Psychiatry']),]
@@ -1843,38 +1375,10 @@ gbifpsycsp<-levels(droplevels(psyc$species))
 ecosyspsycsp[which(ecosyspsycsp%in%gbifpsycsp==F)]
 
 #Basic MaxEnt with two predictors for Psychiatry
-library(rJava)
-dat=psyc@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Psychiatry',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_psychiatry<-ENMevaluate(psyc@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                       ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_psychiatry@results
 tuneparameters_psychiatry@results[which.min(tuneparameters_psychiatry@results$AICc),]#Can use other parameters to select best method
@@ -1886,7 +1390,7 @@ tp_psychiatry<-readRDS("tuneparameters_Psychiatry")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1898,10 +1402,17 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Psychiatry',scales=list(dra
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_psychiatry<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=1.0','threshold=TRUE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Psychiatry')
+maxent_psychiatry<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,a=bg_BC,
+                          factors="swa_2000lulc_2km",
+                          args=c('betamultiplier=4.0',
+                                 'linear=FALSE',
+                                 'quadratic=FALSE',
+                                 'hinge=TRUE',
+                                 'threshold=FALSE',
+                                 'product=FALSE',
+                                 "-P","-J","replicates=5"),
+                          path='MaxEntOutput/Psychiatry')
+
 
 
 obs<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Obstetrics and gynaecology']),]
@@ -1915,38 +1426,10 @@ gbifobssp<-levels(droplevels(obs$species))
 ecosysobssp[which(ecosysobssp%in%gbifobssp==F)]
 
 #Basic MaxEnt with two predictors for Obstetrics and gynaecology
-library(rJava)
-dat=obs@data
-m1<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,factors=c("swa_2000lulc_2km"),args=c("-P"))#Selecting 2000 for pop and lc 
-m1#View output as html
-
-#Predict habitat suitability for the species
-p1<-predict(m1,ghana_envvars)
-rtheme<-rasterTheme(region=brewer.pal(9,'Blues'))
-levelplot(p1,par.settings='rtheme',margin=F,main='Medicine: Obstetrics and gynaecology',scales=list(draw=F),xlab=NULL,ylab=NULL)+layer(sp.polygons(ghanamap))
-
-# More complex and proper application of maxent ---------------------------
-
-#Extensions
-#Bias file (to take account of sampling bias)
-densgbifrecs <- kde2d(ghana_species_pts_insidemap@coords[,1],ghana_species_pts_insidemap@coords[,2],n=100)#Default bandwidths
-densgbifrecs_ras1 <- raster(densgbifrecs)
-
-#Make sure density layer has same resolution and extent as env. data
-densgbifrecs_ras<-mask(resample(densgbifrecs_ras1,ghana_envvars),ghana_envvars[[1]],maskvalue=NA)
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+layer(sp.polygons(ghanamap))
-
-bg_BC<-randomPoints(densgbifrecs_ras,2000,prob=T) #Weighted selection of background by biasfile
-
-levelplot(densgbifrecs_ras,scales=list(draw=F),margin=F,par.settings='rtheme')+
-  layer(sp.polygons(ghanamap))+
-  layer(sp.points(SpatialPoints(bg_BC)))
-
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
 tuneparameters_obstetrics<-ENMevaluate(obs@coords,
-                                    ghana_envvars[[c(4,16,20,26)]],categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
+                                       ghana_envvars[[c(4,16,20,26)]],algorithm="maxent.jar",categoricals="swa_2000lulc_2km",method="block",bg.coords=bg_BC)
 
 tuneparameters_obstetrics@results
 tuneparameters_obstetrics@results[which.min(tuneparameters_obstetrics@results$AICc),]#Can use other parameters to select best method
@@ -1958,7 +1441,7 @@ tp_obstetrics<-readRDS("tuneparameters_Obstetrics and gynaecology")
 #-J turns on jackknifing
 #Betamultiplier to 4 and threshold features off
 #a gives background data
-maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=4.0','threshold=FALSE','product=TRUE',"-P","-J"))
+maxentfull<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,a=bg_BC,factors="swa_2000lulc_2km",args=c('betamultiplier=3.0','threshold=FALSE','product=FALSE',"-P","-J"))
 
 maxentfull
 maxentfull@results #Note AUC
@@ -1970,7 +1453,13 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Obstetrics and gynaecology'
 
 
 #Write maxent results to file which you can later read in to make response curves etc in R
-maxent_obstetrics<-write<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,a=bg_BC,
-                                   factors="swa_2000lulc_2km",
-                                   args=c('betamultiplier=4.0','threshold=FALSE','product=TRUE',"-P","-J","replicates=5"),
-                                   path='MaxEntOutput/Obstetrics and gynaecology')
+maxent_obstetrics<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,a=bg_BC,
+                          factors="swa_2000lulc_2km",
+                          args=c('betamultiplier=3.0',
+                                 'linear=FALSE',
+                                 'quadratic=FALSE',
+                                 'hinge=TRUE',
+                                 'threshold=FALSE',
+                                 'product=FALSE',
+                                 "-P","-J","replicates=5"),
+                          path='MaxEntOutput/Obstetrics')
