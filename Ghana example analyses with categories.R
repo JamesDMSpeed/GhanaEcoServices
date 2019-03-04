@@ -8,6 +8,7 @@ require(rasterVis)
 require(ENMeval)
 require(MASS)
 require(sp)
+require(rgdal)
 
 #Get data
 data<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
@@ -115,28 +116,165 @@ pairs(ghana1[[c(4,7,12,13,16,17,19)]])
 lc1975<-raster('Landcover maps/west_africa_land-use_land-cover_1975_2km/swa_1975lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc1975))
 ghanalc1975<-mask(crop(lc1975,ghanat),ghanat)
-plot(ghanalc1975)
+
+ghanalc1975@data@attributes[[1]][,1:5]
+
+#make a new raster, leaving out the attribute table for simplicity
+ghanalc1975_simple <- setValues(raster(ghanalc1975),ghanalc1975[])
+
+# 1 represents forest
+ghanalc1975_simple[ghanalc1975_simple==25]<-1
+ghanalc1975_simple[ghanalc1975_simple==15]<-1
+ghanalc1975_simple[ghanalc1975_simple==21]<-1
+ghanalc1975_simple[ghanalc1975_simple==23]<-1
+ghanalc1975_simple[ghanalc1975_simple==28]<-1
+
+#2 represents savanna
+ghanalc1975_simple[ghanalc1975_simple==4]<-2
+ghanalc1975_simple[ghanalc1975_simple==22]<-2
+ghanalc1975_simple[ghanalc1975_simple==29]<-2
+ghanalc1975_simple[ghanalc1975_simple==31]<-2
+ghanalc1975_simple[ghanalc1975_simple==32]<-2
+
+#3 represents wetlands
+ghanalc1975_simple[ghanalc1975_simple==7]<-3
+ghanalc1975_simple[ghanalc1975_simple==9]<-3
+
+#4 represents agriculture
+ghanalc1975_simple[ghanalc1975_simple==6]<-4
+ghanalc1975_simple[ghanalc1975_simple==8]<-4
+ghanalc1975_simple[ghanalc1975_simple==14]<-4
+ghanalc1975_simple[ghanalc1975_simple==24]<-4
+ghanalc1975_simple[ghanalc1975_simple==27]<-4
+
+#5 represents landscape area
+ghanalc1975_simple[ghanalc1975_simple==10]<-5
+ghanalc1975_simple[ghanalc1975_simple==11]<-5
+ghanalc1975_simple[ghanalc1975_simple==12]<-5
+ghanalc1975_simple[ghanalc1975_simple==13]<-5
+ghanalc1975_simple[ghanalc1975_simple==78]<-5
+
+#6 represents clouds
+ghanalc1975_simple[ghanalc1975_simple==99]<-6
+
+#Checking summary of simplified habitat areas
+ghanalc1975_simple@data@attributes
+ghanalc1975_simple
+summary(as.factor(ghanalc1975_simple))
+summary(as.factor(getValues(ghanalc1975_simple)))
 #NB legend is in RAT table
-levels(ghanalc1975)
-title( main = "Land cover 1975")
-legend('r',pch=16,col=c('green','pink','gray'),c('forest','degraded forest','agriculture'))
+levels(ghanalc1975_simple)
 
 #Do the same with other years too
+#Using lc2000 for maxent modelling
 lc2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2000lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2000))
 ghanalc2000<-mask(crop(lc2000,ghanat),ghanat)
+
+#checking table that describes the different values associated with the values
+ghanalc2000@data@attributes[[1]][,1:5]
+
+#make a new raster, leaving out the attribute table for simplicity
+ghanalc2000_simple <- setValues(raster(ghanalc2000),ghanalc2000[])
+
+#Simplifying habitat areas
+#1 represents forest
+ghanalc2000_simple[ghanalc2000_simple==25]<-1
+ghanalc2000_simple[ghanalc2000_simple==15]<-1
+ghanalc2000_simple[ghanalc2000_simple==21]<-1
+ghanalc2000_simple[ghanalc2000_simple==23]<-1
+ghanalc2000_simple[ghanalc2000_simple==28]<-1
+
+#2 represents savanna
+ghanalc2000_simple[ghanalc2000_simple==4]<-2
+ghanalc2000_simple[ghanalc2000_simple==22]<-2
+ghanalc2000_simple[ghanalc2000_simple==29]<-2
+ghanalc2000_simple[ghanalc2000_simple==31]<-2
+ghanalc2000_simple[ghanalc2000_simple==32]<-2
+
+#3 represents wetlands
+ghanalc2000_simple[ghanalc2000_simple==7]<-3
+ghanalc2000_simple[ghanalc2000_simple==9]<-3
+
+#4 represents agriculture
+ghanalc2000_simple[ghanalc2000_simple==6]<-4
+ghanalc2000_simple[ghanalc2000_simple==8]<-4
+ghanalc2000_simple[ghanalc2000_simple==14]<-4
+ghanalc2000_simple[ghanalc2000_simple==24]<-4
+ghanalc2000_simple[ghanalc2000_simple==27]<-4
+
+#5 represents landscape area
+ghanalc2000_simple[ghanalc2000_simple==10]<-5
+ghanalc2000_simple[ghanalc2000_simple==11]<-5
+ghanalc2000_simple[ghanalc2000_simple==12]<-5
+ghanalc2000_simple[ghanalc2000_simple==13]<-5
+ghanalc2000_simple[ghanalc2000_simple==78]<-5
+
+#6 represents clouds
+ghanalc2000_simple[ghanalc2000_simple==99]<-6
+
+#Checking summary of simplified habitat areas
+ghanalc2000_simple@data@attributes
+ghanalc2000_simple
+summary(as.factor(ghanalc2000_simple))
+summary(as.factor(getValues(ghanalc2000_simple)))
 plot(ghanalc2000)
-levels(ghanalc2000)
+levels(ghanalc2000_simple)
 title( main = "Land cover 2000")
-legend('r',pch=16,col=c('green','pink','gray'),c('forest','degraded forest','agriculture'))
+legend('r',pch=16,col=c('green','gray','blue','yellow','brown','white'),c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
 
 lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2013))
 ghanalc2013<-mask(crop(lc2013,ghanat),ghanat)
 plot(ghanalc2013)
 levels(ghanalc2013)
-title( main = "Land cover 2013")
-legend('r',pch=16,col=c('green','pink','gray'),c('forest','degraded forest','agriculture'))
+#checking table that describes the different values associated with the values
+ghanalc2013@data@attributes[[1]][,1:5]
+
+#make a new raster, leaving out the attribute table for simplicity
+ghanalc2013_simple <- setValues(raster(ghanalc2013),ghanalc2013[])
+
+#Simplifying habitat areas
+#1 represents forest
+ghanalc2013_simple[ghanalc2013_simple==25]<-1
+ghanalc2013_simple[ghanalc2013_simple==15]<-1
+ghanalc2013_simple[ghanalc2013_simple==21]<-1
+ghanalc2013_simple[ghanalc2013_simple==23]<-1
+ghanalc2013_simple[ghanalc2013_simple==28]<-1
+
+#2 represents savanna
+ghanalc2013_simple[ghanalc2013_simple==4]<-2
+ghanalc2013_simple[ghanalc2013_simple==22]<-2
+ghanalc2013_simple[ghanalc2013_simple==29]<-2
+ghanalc2013_simple[ghanalc2013_simple==31]<-2
+ghanalc2013_simple[ghanalc2013_simple==32]<-2
+
+#3 represents wetlands
+ghanalc2013_simple[ghanalc2013_simple==7]<-3
+ghanalc2013_simple[ghanalc2013_simple==9]<-3
+
+#4 represents agriculture
+ghanalc2013_simple[ghanalc2013_simple==6]<-4
+ghanalc2013_simple[ghanalc2013_simple==8]<-4
+ghanalc2013_simple[ghanalc2013_simple==14]<-4
+ghanalc2013_simple[ghanalc2013_simple==24]<-4
+ghanalc2013_simple[ghanalc2013_simple==27]<-4
+
+#5 represents landscape area
+ghanalc2013_simple[ghanalc2013_simple==10]<-5
+ghanalc2013_simple[ghanalc2013_simple==11]<-5
+ghanalc2013_simple[ghanalc2013_simple==12]<-5
+ghanalc2013_simple[ghanalc2013_simple==13]<-5
+ghanalc2013_simple[ghanalc2013_simple==78]<-5
+
+#6 represents clouds
+ghanalc2013_simple[ghanalc2013_simple==99]<-6
+
+#Checking summary of simplified habitat areas
+ghanalc2013_simple@data@attributes
+ghanalc2013_simple
+summary(as.factor(ghanalc2013_simple))
+summary(as.factor(getValues(ghanalc2013_simple)))
 
 #Cropping Ghana from Global population density data
 pd2000<-raster('human population data/gpw2000_30_sec.tif')
@@ -149,26 +287,23 @@ pd2005<-raster('human population data/gpw2005_30_sec.tif')
 pd2005ghana1<-crop(pd2005,ghanamap)
 pd2005ghana<-mask(pd2005ghana1,ghanamap)
 plot(pd2005ghana)
-title( main = "Population density 2005")
 
 pd2010<-raster('human population data/gpw2010_30_sec.tif')
 pd2010ghana1<-crop(pd2010,ghanamap)
 pd2010ghana<-mask(pd2010ghana1,ghanamap)
 plot(pd2010ghana)
-title( main = "Population density 2010")
 
 pd2015<-raster('human population data/gpw2015_30_sec.tif')
 pd2015ghana1<-crop(pd2015,ghanamap)
 pd2015ghana<-mask(pd2015ghana1,ghanamap)
 plot(pd2015ghana)
-title( main = "Population density 2015")
 
 pd2020<-raster('human population data/gpw2020_30_sec.tif')
 pd2020ghana1<-crop(pd2020,ghanamap)
 pd2020ghana<-mask(pd2020ghana1,ghanamap)
 plot(pd2020ghana)
-title( main = "Population density 2020")
 
+#Using population data 2000 for maxent modelling
 #Stack up popdata
 popdat<-stack(pd2000ghana,pd2005ghana,pd2010ghana,pd2015ghana,pd2020ghana)
 
@@ -178,7 +313,7 @@ writeRaster(popdatrs,'GhanaPopData')
 ghanapopdat<-stack('GhanaPopData')
 
 #Stack up lcdata
-lcdat<-stack(lc1975,lc2000,lc2013)
+lcdat<-stack(ghanalc1975_simple,ghanalc2000_simple,ghanalc2013_simple)
 
 #Project to same crs as climate data
 lcdatp<-projectRaster(lcdat,ghana1,method="ngb")
@@ -187,6 +322,7 @@ lcdatp<-projectRaster(lcdat,ghana1,method="ngb")
 lcdatrs<-resample(lcdatp,ghana1,method="ngb")#Nearest neighbour as categorical
 
 ghana_envvars<-stack(ghana1,mask(ghanapopdat,ghana1[[1]]),mask(lcdatrs,ghana1[[1]]))
+
 
 #Merging health care with gbif recs to a data frame 
 healthcare_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Health care']),]
