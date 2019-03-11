@@ -2099,3 +2099,22 @@ maxent_obstetrics_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],obs,a=b
                                               "-P","-J","replicates=5"),
                                        
                                        path='MaxEntOutput/Obstetrics_simplelandcover')
+
+#Making point plots of no.of species in categories vs AUC values
+#read in table
+categories<-read.csv('categories.csv')
+library("ggplot2")
+summary(categories)
+View(categories)
+ggplot (categories, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
+ggplot(categories, aes(x= No_sp, y= AUC, label=Categories))+
+  geom_point() +geom_text(aes(label=Categories),hjust=0, vjust=0)
+
+#Making point plots of no.of species in health care vs AUC values
+#read in table
+healthcare_groups<-read.csv('healthcare_groups.csv')
+summary(healthcare_groups)
+View(healthcare_groups)
+ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
+ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
+  geom_point() +geom_text(aes(label=Groups),hjust=0, vjust=0)
