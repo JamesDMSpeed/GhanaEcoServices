@@ -1,0 +1,17 @@
+Groups,No_sp,AUC
+Anaesthetics,23,0.531
+Dentistry,9,0.594
+Dermatology,148,0.557
+Endocrinology,88,0.537
+Excipients,4,0.79
+Fever,59,0.605
+Immunology,43,0.642
+Infertility,22,0.685
+Malaria,215,0.578
+Musculoskeletal and cardiology,2,0.681
+Neurology,28,0.613
+Obstetrics and gynaecology,18,0.517
+Oncology,174,0.544
+Ophthalmology,5,0.745
+Orthopaedics,22,0.655
+Psychiatry,1,0.785
