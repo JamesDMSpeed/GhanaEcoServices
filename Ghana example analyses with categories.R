@@ -2139,3 +2139,44 @@ View(healthcare_groups)
 ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
 ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
   geom_point() +geom_text(aes(label=Groups),hjust=0, vjust=0)
+
+#MaxEnt models for each of the malaria spp ####---- 
+malspp<-levels(droplevels(mal$species))
+malariaspp<-data.frame(species=malspp,AUC=rep(NA,times=length(malspp)),
+                       bio16.contribution=rep(NA,times=length(malspp)),
+                       bio4.contribution=rep(NA,times=length(malspp)),
+                       gpw2000_30_sec.contribution=rep(NA,times=length(malspp)),
+                       simplelc2000.contribution=rep(NA,times=length(malspp)),
+                       bio16.permutation.importance=rep(NA,times=length(malspp)),
+                       bio4.permutation.importance=rep(NA,times=length(malspp)),
+                       gpw2000_30_sec.permutation.importance=rep(NA,times=length(malspp)),
+                       simplelc2000.permutation.importance=rep(NA,times=length(malspp)))
+
+for (i in 1:length(malspp)){
+  maxent_mal<-maxent(ghana_envvars[[c(4,16,20,29)]],mal@coords[mal$species==malspp[i],],a=bg_BC,
+                     factors="simplelc2000",
+                     args=c('betamultiplier=2.5',
+                            'linear=TRUE',
+                            'quadratic=TRUE',
+                            'hinge=FALSE',
+                            'threshold=FALSE',
+                            'product=FALSE'),#Currently using tuning parameters for whole malaria category
+                     path=paste0('MaxEntOutput/MalariaSpecies/',malspp[i]))
+  
+  malariaspp$AUC[i]<-as.data.frame(t(maxent_mal@results))$Training.AUC
+  malariaspp$bio16.contribution[i]<-as.data.frame(t(maxent_mal@results))$bio16.contribution
+  malariaspp$bio4.contribution[i]<-as.data.frame(t(maxent_mal@results))$bio4.contribution
+  malariaspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_mal@results))$gpw2000_30_sec.contribution
+  malariaspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_mal@results))$simplelc2000.contribution
+  malariaspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$bio16.permutation.importance
+  malariaspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$bio4.permutation.importance
+  malariaspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$gpw2000_30_sec.permutation.importance
+  malariaspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$simplelc2000.permutation.importance
+}
+head(malariaspp)
+write.csv(malariaspp,'MalariaSppMaxEntOutput.csv')
+
+hist(malariaspp$AUC)
+hist(malariaspp$bio16.contribution) #Repeat for all variables
+
+
