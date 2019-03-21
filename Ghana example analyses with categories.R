@@ -338,6 +338,15 @@ ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Ca
 gbifhcsp<-levels(droplevels(healthcare_gbif$species)) 
 ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
+#Health care convex hull area
+#First convert to utm to work in m
+healthcare_gbif_utm<-project(healthcare_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+health_hull<-chull(healthcare_gbif_utm)
+health_hul1 <- c(health_hull, health_hull[1])
+health_hull.coords <- healthcare_gbif_utm[health_hull,]
+health_hull_poly<-Polygon(health_hull.coords)
+health_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Health care
 library(rJava)
 dat=healthcare_gbif@data
@@ -513,6 +522,18 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Categor
 ecosyspursp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Water purification"])))
 gbifpursp<-levels(droplevels(purif_gbif$species)) 
 ecosyspursp[which(ecosyspursp%in%gbifpursp==F)]
+
+#Purification convex hull area
+#First convert to utm to work in m
+purif_gbif_utm<-project(purif_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+purif_hull<-chull(purif_gbif_utm)
+purif_hul1 <- c(purif_hull, purif_hull[1])
+purif_hull.coords <- purif_gbif_utm[purif_hull,]
+purif_hull_poly<-Polygon(purif_hull.coords)
+purif_hull_poly@area/(1000*1000)#Area in km2
+
+
+
 
 #Basic MaxEnt with two predictors for Water purifiction
 #Tuning #Note this takes a while to estimate
