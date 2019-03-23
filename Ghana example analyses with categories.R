@@ -218,10 +218,15 @@ ghanalc2000_simple@data@attributes
 ghanalc2000_simple
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
-plot(ghanalc2000)
+plot(ghanalc2000_simple)
 levels(ghanalc2000_simple)
 title( main = "Land cover 2000")
 legend('r',pch=16,col=c('green','gray','blue','yellow','brown','white'),c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
+
+rat <- levels(ghanalc2000_simple)[[1]]
+rat$ghanalc2000_simple <- c('forest', 'savanna', 'wetlands','agriculture','landscape area','clouds')
+rat$class <- c('1', '2', '3', '4', '5', '6')
+levels(ghanalc2000_simple) <- rat
 
 lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2013))
@@ -338,6 +343,15 @@ ecosyshcsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Ca
 gbifhcsp<-levels(droplevels(healthcare_gbif$species)) 
 ecosyshcsp[which(ecosyshcsp%in%gbifhcsp==F)]
 
+#Health care convex hull area
+#First convert to utm to work in m
+healthcare_gbif_utm<-project(healthcare_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+health_hull<-chull(healthcare_gbif_utm)
+health_hul1 <- c(health_hull, health_hull[1])
+health_hull.coords <- healthcare_gbif_utm[health_hull,]
+health_hull_poly<-Polygon(health_hull.coords)
+health_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Health care
 library(rJava)
 dat=healthcare_gbif@data
@@ -440,6 +454,16 @@ ecosysagrsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$C
 gbifagrsp<-levels(droplevels(agricult_gbif$species)) 
 ecosysagrsp[which(ecosysagrsp%in%gbifagrsp==F)]
 
+
+#Agriculture convex hull area
+#First convert to utm to work in m
+agricult_gbif_utm<-project(agricult_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+agricult_hull<-chull(agricult_gbif_utm)
+agricult_hul1 <- c(agricult_hull, agricult_hull[1])
+agricult_hull.coords <- agricult_gbif_utm[agricult_hull,]
+agricult_hull_poly<-Polygon(agricult_hull.coords)
+agricult_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Agriculture
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -514,6 +538,16 @@ ecosyspursp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$C
 gbifpursp<-levels(droplevels(purif_gbif$species)) 
 ecosyspursp[which(ecosyspursp%in%gbifpursp==F)]
 
+
+#Water purification convex hull area
+#First convert to utm to work in m
+purif_gbif_utm<-project(purif_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+purif_hull<-chull(purif_gbif_utm)
+purif_hul1 <- c(purif_hull, purif_hull[1])
+purif_hull.coords <- purif_gbif_utm[purif_hull,]
+purif_hull_poly<-Polygon(purif_hull.coords)
+purif_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Water purifiction
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -586,6 +620,16 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Categor
 ecosysconssp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Construction"])))
 gbifconssp<-levels(droplevels(construct_gbif$species)) 
 ecosysconssp[which(ecosysconssp%in%gbifconssp==F)]
+
+
+#Construction convex hull area
+#First convert to utm to work in m
+construct_gbif_utm<-project(construct_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+construct_hull<-chull(construct_gbif_utm)
+construct_hul1 <- c(construct_hull, construct_hull[1])
+construct_hull.coords <- construct_gbif_utm[construct_hull,]
+construct_hull_poly<-Polygon(construct_hull.coords)
+construct_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Construction
 #Tuning #Note this takes a while to estimate
@@ -660,6 +704,17 @@ ecosyssocsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$C
 gbifsocsp<-levels(droplevels(social_gbif$species)) 
 ecosyssocsp[which(ecosyssocsp%in%gbifsocsp==F)]
 
+
+#Social convex hull area
+#First convert to utm to work in m
+social_gbif_utm<-project(social_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+social_hull<-chull(social_gbif_utm)
+social_hul1 <- c(social_hull, social_hull[1])
+social_hull.coords <- social_gbif_utm[social_hull,]
+social_hull_poly<-Polygon(social_hull.coords)
+social_hull_poly@area/(1000*1000)
+
+
 #Basic MaxEnt with two predictors for social
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -733,6 +788,17 @@ ecosysensp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Ca
 gbifensp<-levels(droplevels(energy_gbif$species)) 
 ecosysensp[which(ecosysensp%in%gbifensp==F)]
 
+
+#Energy convex hull area
+#First convert to utm to work in m
+energy_gbif_utm<-project(energy_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+energy_hull<-chull(energy_gbif_utm)
+energy_hul1 <- c(energy_hull, energy_hull[1])
+energy_hull.coords <- energy_gbif_utm[energy_hull,]
+energy_hull_poly<-Polygon(energy_hull.coords)
+energy_hull_poly@area/(1000*1000)
+
+
 #Basic MaxEnt with two predictors for energy
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -804,6 +870,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Categor
 ecosysfnsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Food and nutrition"])))
 gbiffnsp<-levels(droplevels(foodnutr_gbif$species)) 
 ecosysfnsp[which(ecosysfnsp%in%gbiffnsp==F)]
+
+#Food and nutrition convex hull area
+#First convert to utm to work in m
+foodnutr_gbif_utm<-project(foodnutr_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+foodnutr_hull<-chull(foodnutr_gbif_utm)
+foodnutr_hul1 <- c(foodnutr_hull, foodnutr_hull[1])
+foodnutr_hull.coords <- foodnutr_gbif_utm[foodnutr_hull,]
+foodnutr_hull_poly<-Polygon(foodnutr_hull.coords)
+foodnutr_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Food and nutrition
 #Tuning #Note this takes a while to estimate
@@ -877,6 +952,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Categor
 ecosysculsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Category=="Culture"])))
 gbifculsp<-levels(droplevels(cultur_gbif$species)) 
 ecosysculsp[which(ecosysculsp%in%gbifculsp==F)]
+
+#Culture convex hull area
+#First convert to utm to work in m
+cultur_gbif_utm<-project(cultur_gbif@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+cultur_hull<-chull(cultur_gbif_utm)
+cultur_hul1 <- c(cultur_hull, cultur_hull[1])
+cultur_hull.coords <- cultur_gbif_utm[cultur_hull,]
+cultur_hull_poly<-Polygon(cultur_hull.coords)
+cultur_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for culture
 #Tuning #Note this takes a while to estimate
@@ -963,6 +1047,16 @@ ecosysansp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Gr
 gbifansp<-levels(droplevels(anaesth$species)) 
 ecosysansp[which(ecosysansp%in%gbifansp==F)]
 
+
+#Anaesthetics convex hull area
+#First convert to utm to work in m
+anaesth_utm<-project(anaesth@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+anaesth_hull<-chull(anaesth_utm)
+anaesth_hul1 <- c(anaesth_hull, anaesth_hull[1])
+anaesth_hull.coords <- anaesth_utm[anaesth_hull,]
+anaesth_hull_poly<-Polygon(anaesth_hull.coords)
+anaesth_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Anaesthetics
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1036,6 +1130,15 @@ ecosysdentsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$
 gbifdentsp<-levels(droplevels(dent$species)) 
 ecosysdentsp[which(ecosysdentsp%in%gbifdentsp==F)]
 
+#Dentistry convex hull area
+#First convert to utm to work in m
+dent_utm<-project(dent@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+dent_hull<-chull(dent_utm)
+dent_hul1 <- c(dent_hull, dent_hull[1])
+dent_hull.coords <- dent_utm[dent_hull,]
+dent_hull_poly<-Polygon(dent_hull.coords)
+dent_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Dentistry
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1106,6 +1209,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosysdermsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Dermatology"])))
 gbifdermsp<-levels(droplevels(derm$species)) 
 ecosysdermsp[which(ecosysdermsp%in%gbifdermsp==F)]
+
+#Dermatology convex hull area
+#First convert to utm to work in m
+derm_utm<-project(derm@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+derm_hull<-chull(derm_utm)
+derm_hul1 <- c(derm_hull, derm_hull[1])
+derm_hull.coords <- derm_utm[derm_hull,]
+derm_hull_poly<-Polygon(derm_hull.coords)
+derm_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Dermatology
 #Tuning #Note this takes a while to estimate
@@ -1178,6 +1290,15 @@ ecosysendosp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$
 gbifendosp<-levels(droplevels(endo$species)) 
 ecosysendosp[which(ecosysendosp%in%gbifendosp==F)]
 
+#Endocrinology convex hull area
+#First convert to utm to work in m
+endo_utm<-project(endo@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+endo_hull<-chull(endo_utm)
+endo_hul1 <- c(endo_hull, endo_hull[1])
+endo_hull.coords <- endo_utm[endo_hull,]
+endo_hull_poly<-Polygon(endo_hull.coords)
+endo_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Endocrinology
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1248,6 +1369,16 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosysexcisp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Excipients"])))
 gbifexcisp<-levels(droplevels(exci$species)) 
 ecosysexcisp[which(ecosysexcisp%in%gbifexcisp==F)]
+
+
+#Excipients convex hull area
+#First convert to utm to work in m
+exci_utm<-project(exci@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+exci_hull<-chull(exci_utm)
+exci_hul1 <- c(exci_hull, exci_hull[1])
+exci_hull.coords <- exci_utm[exci_hull,]
+exci_hull_poly<-Polygon(exci_hull.coords)
+exci_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Excipients
 #Tuning #Note this takes a while to estimate
@@ -1321,6 +1452,15 @@ ecosysfevsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$G
 gbiffevsp<-levels(droplevels(fev$species)) 
 ecosysfevsp[which(ecosysfevsp%in%gbiffevsp==F)]
 
+#Fever convex hull area
+#First convert to utm to work in m
+fev_utm<-project(fev@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+fev_hull<-chull(fev_utm)
+fev_hul1 <- c(fev_hull, fev_hull[1])
+fev_hull.coords <- fev_utm[fev_hull,]
+fev_hull_poly<-Polygon(fev_hull.coords)
+fev_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Fever
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1390,6 +1530,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosysimmusp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Immunology"])))
 gbifimmusp<-levels(droplevels(immu$species)) 
 ecosysimmusp[which(ecosysimmusp%in%gbifimmusp==F)]
+
+#Immunology convex hull area
+#First convert to utm to work in m
+immu_utm<-project(immu@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+immu_hull<-chull(immu_utm)
+immu_hul1 <- c(immu_hull, immu_hull[1])
+immu_hull.coords <- immu_utm[immu_hull,]
+immu_hull_poly<-Polygon(immu_hull.coords)
+immu_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Immunology
 #Tuning #Note this takes a while to estimate
@@ -1463,6 +1612,15 @@ ecosysinfersp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses
 gbifinfersp<-levels(droplevels(infer$species)) 
 ecosysinfersp[which(ecosysinfersp%in%gbifinfersp==F)]
 
+#Infertility convex hull area
+#First convert to utm to work in m
+infer_utm<-project(infer@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+infer_hull<-chull(infer_utm)
+infer_hul1 <- c(infer_hull, infer_hull[1])
+infer_hull.coords <- infer_utm[infer_hull,]
+infer_hull_poly<-Polygon(infer_hull.coords)
+infer_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Infertility
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1534,6 +1692,16 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosysmalsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Malaria"])))
 gbifmalsp<-levels(droplevels(mal$species)) 
 ecosysmalsp[which(ecosysmalsp%in%gbifmalsp==F)]
+
+#Malaria convex hull area
+#First convert to utm to work in m
+mal_utm<-project(mal@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+mal_hull<-chull(mal_utm)
+mal_hul1 <- c(mal_hull, mal_hull[1])
+mal_hull.coords <- mal_utm[mal_hull,]
+mal_hull_poly<-Polygon(mal_hull.coords)
+mal_hull_poly@area/(1000*1000)
+
 
 #Basic MaxEnt with two predictors for Malaria
 #Tuning #Note this takes a while to estimate
@@ -1609,6 +1777,15 @@ ecosysmuscarsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUse
 gbifmuscarsp<-levels(droplevels(muscar$species)) 
 ecosysmuscarsp[which(ecosysmuscarsp%in%gbifmuscarsp==F)]
 
+#Musculoskeletal and cardiology convex hull area
+#First convert to utm to work in m
+muscar_utm<-project(muscar@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+muscar_hull<-chull(muscar_utm)
+muscar_hul1 <- c(muscar_hull, muscar_hull[1])
+muscar_hull.coords <- muscar_utm[muscar_hull,]
+muscar_hull_poly<-Polygon(muscar_hull.coords)
+muscar_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Musculoskeletal and cardiology
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1681,6 +1858,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosysneurosp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Neurology"])))
 gbifneurosp<-levels(droplevels(neuro$species)) 
 ecosysneurosp[which(ecosysneurosp%in%gbifneurosp==F)]
+
+#Neurology convex hull area
+#First convert to utm to work in m
+neuro_utm<-project(neuro@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+neuro_hull<-chull(neuro_utm)
+neuro_hul1 <- c(neuro_hull, neuro_hull[1])
+neuro_hull.coords <- neuro_utm[neuro_hull,]
+neuro_hull_poly<-Polygon(neuro_hull.coords)
+neuro_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Neurology
 #Tuning #Note this takes a while to estimate
@@ -1756,6 +1942,15 @@ ecosysoncosp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$
 gbifoncosp<-levels(droplevels(onco$species)) 
 ecosysoncosp[which(ecosysoncosp%in%gbifoncosp==F)]
 
+#Oncology convex hull area
+#First convert to utm to work in m
+onco_utm<-project(onco@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+onco_hull<-chull(onco_utm)
+onco_hul1 <- c(onco_hull, onco_hull[1])
+onco_hull.coords <- onco_utm[onco_hull,]
+onco_hull_poly<-Polygon(onco_hull.coords)
+onco_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Oncology
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1828,6 +2023,15 @@ ecosysophtsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$
 gbifophtsp<-levels(droplevels(opht$species)) 
 ecosysophtsp[which(ecosysophtsp%in%gbifophtsp==F)]
 
+#Ophthalmology convex hull area
+#First convert to utm to work in m
+opht_utm<-project(opht@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+opht_hull<-chull(opht_utm)
+opht_hul1 <- c(opht_hull, opht_hull[1])
+opht_hull.coords <- opht_utm[opht_hull,]
+opht_hull_poly<-Polygon(opht_hull.coords)
+opht_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Ophthalmology
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1899,6 +2103,16 @@ ecosysorthosp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses
 gbiforthosp<-levels(droplevels(ortho$species)) 
 ecosysorthosp[which(ecosysorthosp%in%gbiforthosp==F)]
 
+#Orthopaedics convex hull area
+#First convert to utm to work in m
+ortho_utm<-project(ortho@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+ortho_hull<-chull(ortho_utm)
+ortho_hul1 <- c(ortho_hull, ortho_hull[1])
+ortho_hull.coords <- ortho_utm[ortho_hull,]
+ortho_hull_poly<-Polygon(ortho_hull.coords)
+ortho_hull_poly@area/(1000*1000)
+
+
 #Basic MaxEnt with two predictors for Orthopaedics
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -1968,6 +2182,15 @@ length(levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group==
 ecosyspsycsp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$Group=="Medicine: Psychiatry"])))
 gbifpsycsp<-levels(droplevels(psyc$species)) 
 ecosyspsycsp[which(ecosyspsycsp%in%gbifpsycsp==F)]
+
+#Psychology convex hull area
+#First convert to utm to work in m
+psyc_utm<-project(psyc@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+psyc_hull<-chull(psyc_utm)
+psyc_hul1 <- c(psyc_hull, psyc_hull[1])
+psyc_hull.coords <- psyc_utm[psyc_hull,]
+psyc_hull_poly<-Polygon(psyc_hull.coords)
+psyc_hull_poly@area/(1000*1000)
 
 #Basic MaxEnt with two predictors for Psychiatry
 #Tuning #Note this takes a while to estimate
@@ -2040,6 +2263,15 @@ ecosysobssp<-levels(droplevels(as.factor(GhanaUses$ConfirmedSppNames[GhanaUses$G
 gbifobssp<-levels(droplevels(obs$species)) 
 ecosysobssp[which(ecosysobssp%in%gbifobssp==F)]
 
+#Obstetrics convex hull area
+#First convert to utm to work in m
+obs_utm<-project(obs@coords,'+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs')
+obs_hull<-chull(obs_utm)
+obs_hul1 <- c(obs_hull, obs_hull[1])
+obs_hull.coords <- obs_utm[obs_hull,]
+obs_hull_poly<-Polygon(obs_hull.coords)
+obs_hull_poly@area/(1000*1000)
+
 #Basic MaxEnt with two predictors for Obstetrics and gynaecology
 #Tuning #Note this takes a while to estimate
 #Use block or checkerboard methods for tuning spatially variable data
@@ -2100,6 +2332,7 @@ maxent_obstetrics_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],obs,a=b
                                        
                                        path='MaxEntOutput/Obstetrics_simplelandcover')
 
+
 #Making point plots of no.of species in categories vs AUC values
 #read in table
 categories<-read.csv('categories.csv')
@@ -2108,7 +2341,7 @@ summary(categories)
 View(categories)
 ggplot (categories, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
 ggplot(categories, aes(x= No_sp, y= AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0, vjust=0)
+  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
 
 #Making point plots of no.of species in health care vs AUC values
 #read in table
@@ -2117,4 +2350,69 @@ summary(healthcare_groups)
 View(healthcare_groups)
 ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
 ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0, vjust=0)
+  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
+
+#Making points plots of no. of records in categories vs AUC values
+#read in table
+cat_records<-read.csv('cat_records.csv')
+summary(cat_records)
+View(cat_records)
+ggplot (cat_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
+ggplot(cat_records, aes(x= No_records, y= AUC, label=Categories))+
+  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+
+#Making points plots of no. of records in categories vs AUC values
+#read in table
+groups_records<-read.csv('groups_records.csv')
+summary(groups_records)
+View(groups_records)
+ggplot (groups_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
+ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
+  geom_point() +geom_text(aes(label=Groups),hjust=0.5, vjust=0.5)
+
+
+#MaxEnt models for each of the malaria spp ####---- 
+malspp<-levels(droplevels(mal$species))
+malariaspp<-data.frame(species=malspp,AUC=rep(NA,times=length(malspp)),
+                       bio16.contribution=rep(NA,times=length(malspp)),
+                       bio4.contribution=rep(NA,times=length(malspp)),
+                       gpw2000_30_sec.contribution=rep(NA,times=length(malspp)),
+                       simplelc2000.contribution=rep(NA,times=length(malspp)),
+                       bio16.permutation.importance=rep(NA,times=length(malspp)),
+                       bio4.permutation.importance=rep(NA,times=length(malspp)),
+                       gpw2000_30_sec.permutation.importance=rep(NA,times=length(malspp)),
+                       simplelc2000.permutation.importance=rep(NA,times=length(malspp)))
+
+for (i in 1:length(malspp)){
+  maxent_mal<-maxent(ghana_envvars[[c(4,16,20,29)]],mal@coords[mal$species==malspp[i],],a=bg_BC,
+                     factors="simplelc2000",
+                     args=c('betamultiplier=2.5',
+                            'linear=TRUE',
+                            'quadratic=TRUE',
+                            'hinge=FALSE',
+                            'threshold=FALSE',
+                            'product=FALSE'),#Currently using tuning parameters for whole malaria category
+                     path=paste0('MaxEntOutput/MalariaSpecies/',malspp[i]))
+  
+  malariaspp$AUC[i]<-as.data.frame(t(maxent_mal@results))$Training.AUC
+  malariaspp$bio16.contribution[i]<-as.data.frame(t(maxent_mal@results))$bio16.contribution
+  malariaspp$bio4.contribution[i]<-as.data.frame(t(maxent_mal@results))$bio4.contribution
+  malariaspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_mal@results))$gpw2000_30_sec.contribution
+  malariaspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_mal@results))$simplelc2000.contribution
+  malariaspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$bio16.permutation.importance
+  malariaspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$bio4.permutation.importance
+  malariaspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$gpw2000_30_sec.permutation.importance
+  malariaspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_mal@results))$simplelc2000.permutation.importance
+}
+head(malariaspp)
+write.csv(malariaspp,'MalariaSppMaxEntOutput.csv')
+
+hist(malariaspp$AUC)
+hist(malariaspp$bio16.contribution) #Repeat for all variables
+hist(malariaspp$bio4.contribution)
+hist(malariaspp$gpw2000_30_sec.contribution)
+hist(malariaspp$simplelc2000.contribution)
+hist(malariaspp$bio16.permutation.importance)
+hist(malariaspp$bio4.permutation.importance)
+hist(malariaspp$gpw2000_30_sec.permutation.importance)
+hist(malariaspp$simplelc2000.permutation.importance)
