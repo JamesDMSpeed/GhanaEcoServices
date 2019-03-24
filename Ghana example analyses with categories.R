@@ -743,7 +743,6 @@ levelplot(pfull,par.settings='rtheme',margin=F,main='Social',scales=list(draw=F)
   layer(sp.points(social_gbif,col=1))
 
 
-
 #Write maxent results to file which you can later read in to make response curves etc in R
 maxent_social<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,
                       factors="swa_2000lulc_2km",
@@ -1118,6 +1117,7 @@ maxent_anaesthetics_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],anaes
                                             
                                             path='MaxEntOutput/Anaesthetics_simplelandcover')
 
+
 #Do same with other groups
 #Merging Dentistry species with Gbif records
 dent<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Dentistry']),]
@@ -1177,6 +1177,7 @@ maxent_dentistry<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,
                                 'product=FALSE',
                                 "-P","-J","replicates=5"),
                          path='MaxEntOutput/Dentistry')
+
 
 #Maxent with simple landcover
 maxent_dentistry_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],dent,a=bg_BC,
