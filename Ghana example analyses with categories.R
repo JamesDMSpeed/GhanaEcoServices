@@ -2374,6 +2374,7 @@ ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
 
 #MaxEnt models for each of the malaria spp ####---- 
 malspp<-levels(droplevels(mal$species))
+malspp<-malspp[tapply(mal$species,droplevels(mal$species),length)>15]
 malariaspp<-data.frame(species=malspp,AUC=rep(NA,times=length(malspp)),
                        bio16.contribution=rep(NA,times=length(malspp)),
                        bio4.contribution=rep(NA,times=length(malspp)),
