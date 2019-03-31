@@ -2369,11 +2369,12 @@ summary(groups_records)
 View(groups_records)
 ggplot (groups_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
 ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.5, vjust=0.5)
+  geom_point() +geom_text(aes(label=Groups),hjust=0.15, vjust=0.5)
 
 
 #MaxEnt models for each of the malaria spp ####---- 
 malspp<-levels(droplevels(mal$species))
+malspp<-malspp[tapply(mal$species,droplevels(mal$species),length)>15]
 malariaspp<-data.frame(species=malspp,AUC=rep(NA,times=length(malspp)),
                        bio16.contribution=rep(NA,times=length(malspp)),
                        bio4.contribution=rep(NA,times=length(malspp)),
@@ -2417,3 +2418,24 @@ hist(malariaspp$bio16.permutation.importance)
 hist(malariaspp$bio4.permutation.importance)
 hist(malariaspp$gpw2000_30_sec.permutation.importance)
 hist(malariaspp$simplelc2000.permutation.importance)
+
+#Making point plots of area of convex hull in categories vs AUC values
+#read in table
+cat_hull<-read.csv('cat_hull.csv')
+library("ggplot2")
+summary(cat_hull)
+View(cat_hull)
+ggplot (cat_hull, aes(x=convex_hull.km.sq, y=AUC)) + geom_point (aes(x=convex_hull, y=AUC))
+ggplot(cat_hull, aes(x=convex_hull, y=AUC, label=Categories))+
+  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+
+
+#Making point plots of area of convex hull in healthcare groups vs AUC values
+#read in table
+groups_hull<-read.csv('groups_hull.csv')
+library("ggplot2")
+summary(groups_hull)
+View(groups_hull)
+ggplot (groups_hull, aes(x=convex_hull.km.sq, y=AUC)) + geom_point (aes(x=convex_hull.km.sq, y=AUC))
+ggplot(groups_hull, aes(x=convex_hull.km.sq, y=AUC, label=Groups))+
+  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
