@@ -2353,6 +2353,7 @@ ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC
 ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
   geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
 
+
 #Making points plots of no. of records in categories vs AUC values
 #read in table
 cat_records<-read.csv('cat_records.csv')
