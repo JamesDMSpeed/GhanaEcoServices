@@ -218,15 +218,12 @@ ghanalc2000_simple@data@attributes
 ghanalc2000_simple
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
+
 plot(ghanalc2000_simple)
 levels(ghanalc2000_simple)
 title( main = "Land cover 2000")
-legend('r',pch=16,col=c('green','gray','blue','yellow','brown','white'),c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
-
-rat <- levels(ghanalc2000_simple)[[1]]
-rat$ghanalc2000_simple <- c('forest', 'savanna', 'wetlands','agriculture','landscape area','clouds')
-rat$class <- c('1', '2', '3', '4', '5', '6')
-levels(ghanalc2000_simple) <- rat
+legend('r',pch=16,col=c('1','2','3','4','5','6'),c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
+levels(ghanalc2000_simple)
 
 lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2013))
@@ -2363,7 +2360,7 @@ ggplot (cat_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y
 ggplot(cat_records, aes(x= No_records, y= AUC, label=Categories))+
   geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
 
-#Making points plots of no. of records in categories vs AUC values
+#Making points plots of no. of records in healthcare groups vs AUC values
 #read in table
 groups_records<-read.csv('groups_records.csv')
 summary(groups_records)
