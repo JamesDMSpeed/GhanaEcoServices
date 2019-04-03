@@ -9,6 +9,8 @@ require(ENMeval)
 require(MASS)
 require(sp)
 require(rgdal)
+require(rgeos)
+require(maptools)
 
 #Get data
 data<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
@@ -39,6 +41,7 @@ Ghana_Species_pts<-SpatialPointsDataFrame(cbind(Ghana_Species$DecimalLongitude,G
 
 #Plot map of Ghana regions 
 ghanamap<-getData('GADM',country='GHA',level=1)
+class(ghanamap)
 plot(ghanamap)
 plot(dataSpatial, add=T)
 crs(ghanamap)
@@ -49,6 +52,19 @@ ghana_species_pts_insidemap<-ghana_species_pts[ghanamap,]
 points(ghana_species_pts_insidemap,cex=0.1,pch=16,col='blue')
 legend('r',pch=16,col=c('red','blue'),c('Discarded records','Retained records'))
 title( main = "Species Occurrence in Ghana")
+
+# Need a background raster for levelplot
+r <- raster(ncol=500, nrow=500)
+extent(r) <- extent(ghanamap)
+ghanamap_ras<-rasterize(ghanamap, r)
+
+# Levelplot for species points
+myTheme <- BTCTheme()
+myTheme$regions$col = c('white')
+GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=NULL,par.settings="myTheme") #scales = list(draw = FALSE)
+GhanaSpp<-GhanaSpp+layer(sp.polygons(ghanamap))
+GhanaSpp<-GhanaSpp+layer(sp.points(ghana_species_pts_insidemap, pch =3, cex =.25, fill="black",col="black"))
+GhanaSpp
 
 #Dataset size
 dim(ghana_species_pts_insidemap@data)
@@ -79,7 +95,7 @@ with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length)
 
 #Elevation data
 ghanaalt<-getData('alt',country='GHA')
-
+class(ghanaalt)
 levelplot(ghanaalt,margin=F,main='Elevation (m)')+
   layer(sp.polygons(ghanamap))
 
@@ -89,8 +105,9 @@ gc1<-getData('worldclim',var='bio',res=2.5)
 #Crop and mask to elevation data
 ghanaC<-crop(gc1,ghanamap)
 ghana1<-mask(ghanaC,ghanamap)
-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')+
-  layer(sp.polygons(ghanamap))
+GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')
+GhanaRain<-GhanaRain+layer(sp.polygons(ghanamap))
+GhanaRain
 
 #Make a pairs plot to check for correlated variables
 pairs(ghana1)#Many highly correlated varaibles as expected
@@ -101,7 +118,6 @@ dim(climdat)
 #Remove NAs
 
 climdat1<-climdat[!is.na(climdat[,1]),]
-
 
 pca1<-princomp(climdat1)
 plot(pca1)
@@ -277,6 +293,24 @@ ghanalc2013_simple@data@attributes
 ghanalc2013_simple
 summary(as.factor(ghanalc2013_simple))
 summary(as.factor(getValues(ghanalc2013_simple)))
+
+GhanaLand2013<-levelplot(ghanalc2013_simple,margin=F,main='Land cover 2013',par.settings='GrTheme')
+GhanaLand2013<-GhanaLand2013+layer(sp.polygons(ghanamap))
+GhanaLand2013
+
+#### Combining levelplots in a single figure ####
+
+# Combine: GhanaSpp, GhanaRain, GhanaLand2013
+# Packages
+library(grid)
+require(gridExtra)
+
+# Hashed out the code to make a 
+
+#GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
+#jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
+grid.arrange(GhanaSpp, GhanaRain, GhanaLand2013, ncol=3, nrow=1, widths=c(1,1,1), heights=c(1),vp = grid::viewport(width=1,height=1),layout_matrix = cbind(c(1), c(2),c(3)))
+#dev.off()
 
 #Cropping Ghana from Global population density data
 pd2000<-raster('human population data/gpw2000_30_sec.tif')
