@@ -9,6 +9,8 @@ require(ENMeval)
 require(MASS)
 require(sp)
 require(rgdal)
+require(rgeos)
+require(maptools)
 
 #Get data
 data<-read.delim(unz('GBIFdownload_Oct2018.zip','occurrence.txt'),sep='\t',quote="",dec='.',header=T)
@@ -39,6 +41,7 @@ Ghana_Species_pts<-SpatialPointsDataFrame(cbind(Ghana_Species$DecimalLongitude,G
 
 #Plot map of Ghana regions 
 ghanamap<-getData('GADM',country='GHA',level=1)
+class(ghanamap)
 plot(ghanamap)
 plot(dataSpatial, add=T)
 crs(ghanamap)
@@ -48,7 +51,20 @@ points(ghana_species_pts,pch=16,cex=0.1,col='red') #Species occurence points
 ghana_species_pts_insidemap<-ghana_species_pts[ghanamap,]
 points(ghana_species_pts_insidemap,cex=0.1,pch=16,col='blue')
 legend('r',pch=16,col=c('red','blue'),c('Discarded records','Retained records'))
-title( main = "Species Occurrence in Ghana")
+title( main = "Species Occurrences in Ghana")
+
+# Need a background raster for levelplot
+r <- raster(ncol=500, nrow=500)
+extent(r) <- extent(ghanamap)
+ghanamap_ras<-rasterize(ghanamap, r)
+
+# Levelplot for species points
+myTheme <- BTCTheme()
+myTheme$regions$col = c('white')
+GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=NULL,par.settings="myTheme") #scales = list(draw = FALSE)
+GhanaSpp<-GhanaSpp+layer(sp.polygons(ghanamap))
+GhanaSpp<-GhanaSpp+layer(sp.points(ghana_species_pts_insidemap, pch =3, cex =.25, fill="green",col="green"))
+GhanaSpp
 
 #Dataset size
 dim(ghana_species_pts_insidemap@data)
@@ -79,7 +95,7 @@ with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length)
 
 #Elevation data
 ghanaalt<-getData('alt',country='GHA')
-
+class(ghanaalt)
 levelplot(ghanaalt,margin=F,main='Elevation (m)')+
   layer(sp.polygons(ghanamap))
 
@@ -89,8 +105,9 @@ gc1<-getData('worldclim',var='bio',res=2.5)
 #Crop and mask to elevation data
 ghanaC<-crop(gc1,ghanamap)
 ghana1<-mask(ghanaC,ghanamap)
-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')+
-  layer(sp.polygons(ghanamap))
+GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')
+GhanaRain<-GhanaRain+layer(sp.polygons(ghanamap))
+GhanaRain
 
 #Make a pairs plot to check for correlated variables
 pairs(ghana1)#Many highly correlated varaibles as expected
@@ -101,7 +118,6 @@ dim(climdat)
 #Remove NAs
 
 climdat1<-climdat[!is.na(climdat[,1]),]
-
 
 pca1<-princomp(climdat1)
 plot(pca1)
@@ -219,6 +235,10 @@ ghanalc2000_simple
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
 
+GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings='BTCTheme')
+GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap))
+GhanaLand2000
+
 plot(ghanalc2000_simple)
 levels(ghanalc2000_simple)
 title( main = "Land cover 2000")
@@ -278,12 +298,15 @@ ghanalc2013_simple
 summary(as.factor(ghanalc2013_simple))
 summary(as.factor(getValues(ghanalc2013_simple)))
 
+
 #Cropping Ghana from Global population density data
 pd2000<-raster('human population data/gpw2000_30_sec.tif')
 pd2000ghana1<-crop(pd2000,ghanamap)
 pd2000ghana<-mask(pd2000ghana1,ghanamap)
-plot(pd2000ghana)
-title( main = "Population density 2000")
+
+pd2000ghana<-levelplot(pd2000ghana,margin=F,main='Population density',par.settings='YlOrRdTheme')
+pd2000ghana<-pd2000ghana+layer(sp.polygons(ghanamap))
+pd2000ghana
 
 pd2005<-raster('human population data/gpw2005_30_sec.tif')
 pd2005ghana1<-crop(pd2005,ghanamap)
@@ -313,6 +336,20 @@ popdat<-stack(pd2000ghana,pd2005ghana,pd2010ghana,pd2015ghana,pd2020ghana)
 popdatrs<-resample(popdat,ghana1,method="bilinear")
 writeRaster(popdatrs,'GhanaPopData')
 ghanapopdat<-stack('GhanaPopData')
+
+#### Combining levelplots in a single figure ####
+
+# Combine: GhanaSpp, GhanaRain, GhanaLand2013
+# Packages
+library(grid)
+require(gridExtra)
+
+# Hashed out the code to make a 
+
+#GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
+#jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
+grid.arrange(GhanaSpp, GhanaRain, GhanaLand2000, pd2000ghana, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),vp = grid::viewport(width=1.5,height=2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
+#dev.off()
 
 #Stack up lcdata
 lcdat<-stack(ghanalc1975, ghanalc2000, ghanalc2013, ghanalc1975_simple,ghanalc2000_simple,ghanalc2013_simple)
@@ -419,24 +456,24 @@ maxent_healthcare<-maxent(ghana_envvars[[c(4,16,20,26)]],healthcare_gbif,a=bg_BC
 
 #Maxent with simple landcover
 maxent_healthcare_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],healthcare_gbif,a=bg_BC,
-                                           
-                                           factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                           
-                                           args=c('betamultiplier=0.5',
-                                                  
-                                                  'linear=TRUE',
-                                                  
-                                                  'quadratic=TRUE',
-                                                  
-                                                  'hinge=FALSE',
-                                                  
-                                                  'threshold=FALSE',
-                                                  
-                                                  'product=FALSE',
-                                                  
-                                                  "-P","-J","replicates=5"),
-                                           
-                                           path='MaxEntOutput/Healthcare_simplelandcover')
+                                          
+                                          factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                          
+                                          args=c('betamultiplier=0.5',
+                                                 
+                                                 'linear=TRUE',
+                                                 
+                                                 'quadratic=TRUE',
+                                                 
+                                                 'hinge=FALSE',
+                                                 
+                                                 'threshold=FALSE',
+                                                 
+                                                 'product=FALSE',
+                                                 
+                                                 "-P","-J","replicates=5"),
+                                          
+                                          path='MaxEntOutput/Healthcare_simplelandcover')
 
 
 #Doing same for other categories
@@ -588,24 +625,24 @@ maxent_purification<-maxent(ghana_envvars[[c(4,16,20,26)]],purif_gbif,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_purification_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],purif_gbif,a=bg_BC,
-                                           
-                                           factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                           
-                                           args=c('betamultiplier=4.0',
-                                                  
-                                                  'linear=TRUE',
-                                                  
-                                                  'quadratic=TRUE',
-                                                  
-                                                  'hinge=TRUE',
-                                                  
-                                                  'threshold=FALSE',
-                                                  
-                                                  'product=TRUE',
-                                                  
-                                                  "-P","-J","replicates=5"),
-                                           
-                                           path='MaxEntOutput/Water purification_simplelandcover')
+                                            
+                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                            
+                                            args=c('betamultiplier=4.0',
+                                                   
+                                                   'linear=TRUE',
+                                                   
+                                                   'quadratic=TRUE',
+                                                   
+                                                   'hinge=TRUE',
+                                                   
+                                                   'threshold=FALSE',
+                                                   
+                                                   'product=TRUE',
+                                                   
+                                                   "-P","-J","replicates=5"),
+                                            
+                                            path='MaxEntOutput/Water purification_simplelandcover')
 
 
 #Merging construction with gbif recs to a data frame
@@ -754,24 +791,24 @@ maxent_social<-maxent(ghana_envvars[[c(4,16,20,26)]],social_gbif,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_social_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],social_gbif,a=bg_BC,
-                                            
-                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                            
-                                            args=c('betamultiplier=4.0',
-                                                   
-                                                   'linear=TRUE',
-                                                   
-                                                   'quadratic=TRUE',
-                                                   
-                                                   'hinge=TRUE',
-                                                   
-                                                   'threshold=FALSE',
-                                                   
-                                                   'product=TRUE',
-                                                   
-                                                   "-P","-J","replicates=5"),
-                                            
-                                            path='MaxEntOutput/Social_simplelandcover')
+                                      
+                                      factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                      
+                                      args=c('betamultiplier=4.0',
+                                             
+                                             'linear=TRUE',
+                                             
+                                             'quadratic=TRUE',
+                                             
+                                             'hinge=TRUE',
+                                             
+                                             'threshold=FALSE',
+                                             
+                                             'product=TRUE',
+                                             
+                                             "-P","-J","replicates=5"),
+                                      
+                                      path='MaxEntOutput/Social_simplelandcover')
 
 
 #Merging energy with gbif recs to a data frame 
@@ -838,24 +875,24 @@ maxent_energy<-maxent(ghana_envvars[[c(4,16,20,26)]],energy_gbif,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_energy_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],energy_gbif,a=bg_BC,
-                                            
-                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                            
-                                            args=c('betamultiplier=4.0',
-                                                   
-                                                   'linear=FALSE',
-                                                   
-                                                   'quadratic=FALSE',
-                                                   
-                                                   'hinge=TRUE',
-                                                   
-                                                   'threshold=FALSE',
-                                                   
-                                                   'product=FALSE',
-                                                   
-                                                   "-P","-J","replicates=5"),
-                                            
-                                            path='MaxEntOutput/Energy_simplelandcover')
+                                      
+                                      factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                      
+                                      args=c('betamultiplier=4.0',
+                                             
+                                             'linear=FALSE',
+                                             
+                                             'quadratic=FALSE',
+                                             
+                                             'hinge=TRUE',
+                                             
+                                             'threshold=FALSE',
+                                             
+                                             'product=FALSE',
+                                             
+                                             "-P","-J","replicates=5"),
+                                      
+                                      path='MaxEntOutput/Energy_simplelandcover')
 
 #Merging food and nutrition with gbif recs to a data frame
 foodnutr_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Food and nutrition']),]
@@ -919,24 +956,24 @@ maxent_foodnutrition<-maxent(ghana_envvars[[c(4,16,20,26)]],foodnutr_gbif,a=bg_B
 
 #Maxent with simple landcover
 maxent_foodnutrition_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],foodnutr_gbif,a=bg_BC,
-                                            
-                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                            
-                                            args=c('betamultiplier=0.5',
-                                                   
-                                                   'linear=TRUE',
-                                                   
-                                                   'quadratic=TRUE',
-                                                   
-                                                   'hinge=FALSE',
-                                                   
-                                                   'threshold=FALSE',
-                                                   
-                                                   'product=FALSE',
-                                                   
-                                                   "-P","-J","replicates=5"),
-                                            
-                                            path='MaxEntOutput/Food and nutrition_simplelandcover')
+                                             
+                                             factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                             
+                                             args=c('betamultiplier=0.5',
+                                                    
+                                                    'linear=TRUE',
+                                                    
+                                                    'quadratic=TRUE',
+                                                    
+                                                    'hinge=FALSE',
+                                                    
+                                                    'threshold=FALSE',
+                                                    
+                                                    'product=FALSE',
+                                                    
+                                                    "-P","-J","replicates=5"),
+                                             
+                                             path='MaxEntOutput/Food and nutrition_simplelandcover')
 
 
 #Merging Culture with gbif recs to a data frame 
@@ -1003,24 +1040,24 @@ maxent_culture<-maxent(ghana_envvars[[c(4,16,20,26)]],cultur_gbif,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_culture_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],cultur_gbif,a=bg_BC,
-                                            
-                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                            
-                                            args=c('betamultiplier=3.5',
-                                                   
-                                                   'linear=FALSE',
-                                                   
-                                                   'quadratic=FALSE',
-                                                   
-                                                   'hinge=TRUE',
-                                                   
-                                                   'threshold=FALSE',
-                                                   
-                                                   'product=FALSE',
-                                                   
-                                                   "-P","-J","replicates=5"),
-                                            
-                                            path='MaxEntOutput/Culture_simplelandcover')
+                                       
+                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                       
+                                       args=c('betamultiplier=3.5',
+                                              
+                                              'linear=FALSE',
+                                              
+                                              'quadratic=FALSE',
+                                              
+                                              'hinge=TRUE',
+                                              
+                                              'threshold=FALSE',
+                                              
+                                              'product=FALSE',
+                                              
+                                              "-P","-J","replicates=5"),
+                                       
+                                       path='MaxEntOutput/Culture_simplelandcover')
 
 #Category count analysis
 speciesdata<-read.csv('FinalDataSpeciesNames.csv')
@@ -1178,24 +1215,24 @@ maxent_dentistry<-maxent(ghana_envvars[[c(4,16,20,26)]],dent,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_dentistry_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],dent,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=3.5',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Dentistry_simplelandcover')
+                                         
+                                         factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                         
+                                         args=c('betamultiplier=3.5',
+                                                
+                                                'linear=FALSE',
+                                                
+                                                'quadratic=FALSE',
+                                                
+                                                'hinge=TRUE',
+                                                
+                                                'threshold=FALSE',
+                                                
+                                                'product=FALSE',
+                                                
+                                                "-P","-J","replicates=5"),
+                                         
+                                         path='MaxEntOutput/Dentistry_simplelandcover')
 
 #Merging Dermatology species with Gbif records
 derm<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Dermatology']),]
@@ -1258,24 +1295,24 @@ maxent_dermatology<-maxent(ghana_envvars[[c(4,16,20,26)]],derm,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_dermatology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],derm,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=0.5',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=FALSE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Dermatology_simplelandcover')
+                                           
+                                           factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                           
+                                           args=c('betamultiplier=0.5',
+                                                  
+                                                  'linear=TRUE',
+                                                  
+                                                  'quadratic=TRUE',
+                                                  
+                                                  'hinge=FALSE',
+                                                  
+                                                  'threshold=FALSE',
+                                                  
+                                                  'product=FALSE',
+                                                  
+                                                  "-P","-J","replicates=5"),
+                                           
+                                           path='MaxEntOutput/Dermatology_simplelandcover')
 
 #Merging Endocrinology species with Gbif records
 endo<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Endocrinology']),]
@@ -1337,24 +1374,24 @@ maxent_endocrinology<-maxent(ghana_envvars[[c(4,16,20,26)]],endo,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_endocrinology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],endo,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=0.5',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=FALSE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Endocrinology_simplelandcover')
+                                             
+                                             factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                             
+                                             args=c('betamultiplier=0.5',
+                                                    
+                                                    'linear=TRUE',
+                                                    
+                                                    'quadratic=TRUE',
+                                                    
+                                                    'hinge=FALSE',
+                                                    
+                                                    'threshold=FALSE',
+                                                    
+                                                    'product=FALSE',
+                                                    
+                                                    "-P","-J","replicates=5"),
+                                             
+                                             path='MaxEntOutput/Endocrinology_simplelandcover')
 
 
 #Merging Excipients species with Gbif records
@@ -1419,24 +1456,24 @@ maxent_excipients<-maxent(ghana_envvars[[c(4,16,20,26)]],exci,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_excipients_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],exci,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=3.0',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=TRUE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Excipients_simplelandcover')
+                                          
+                                          factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                          
+                                          args=c('betamultiplier=3.0',
+                                                 
+                                                 'linear=TRUE',
+                                                 
+                                                 'quadratic=TRUE',
+                                                 
+                                                 'hinge=TRUE',
+                                                 
+                                                 'threshold=FALSE',
+                                                 
+                                                 'product=TRUE',
+                                                 
+                                                 "-P","-J","replicates=5"),
+                                          
+                                          path='MaxEntOutput/Excipients_simplelandcover')
 
 
 #Merging Fever species with Gbif records
@@ -1499,24 +1536,24 @@ maxent_fever<-maxent(ghana_envvars[[c(4,16,20,26)]],fev,a=bg_BC,
                      path='MaxEntOutput/Fever')
 #Maxent with simple landcover
 maxent_fever_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],fev,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=4.0',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=FALSE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Fever_simplelandcover')
+                                     
+                                     factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                     
+                                     args=c('betamultiplier=4.0',
+                                            
+                                            'linear=TRUE',
+                                            
+                                            'quadratic=TRUE',
+                                            
+                                            'hinge=FALSE',
+                                            
+                                            'threshold=FALSE',
+                                            
+                                            'product=FALSE',
+                                            
+                                            "-P","-J","replicates=5"),
+                                     
+                                     path='MaxEntOutput/Fever_simplelandcover')
 
 #Merging Immunology species with Gbif records
 immu<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Immunology']),]
@@ -1579,24 +1616,24 @@ maxent_immunology<-maxent(ghana_envvars[[c(4,16,20,26)]],immu,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_immunology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],immu,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=3.5',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Immunology_simplelandcover')
+                                          
+                                          factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                          
+                                          args=c('betamultiplier=3.5',
+                                                 
+                                                 'linear=FALSE',
+                                                 
+                                                 'quadratic=FALSE',
+                                                 
+                                                 'hinge=TRUE',
+                                                 
+                                                 'threshold=FALSE',
+                                                 
+                                                 'product=FALSE',
+                                                 
+                                                 "-P","-J","replicates=5"),
+                                          
+                                          path='MaxEntOutput/Immunology_simplelandcover')
 
 
 #Merging Infertility species with Gbif records
@@ -1661,24 +1698,24 @@ maxent_infertility<-maxent(ghana_envvars[[c(4,16,20,26)]],infer,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_infertility_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],infer,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=4.0',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Infertility_simplelandcover')
+                                           
+                                           factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                           
+                                           args=c('betamultiplier=4.0',
+                                                  
+                                                  'linear=FALSE',
+                                                  
+                                                  'quadratic=FALSE',
+                                                  
+                                                  'hinge=TRUE',
+                                                  
+                                                  'threshold=FALSE',
+                                                  
+                                                  'product=FALSE',
+                                                  
+                                                  "-P","-J","replicates=5"),
+                                           
+                                           path='MaxEntOutput/Infertility_simplelandcover')
 
 #Merging Malaria species with Gbif records
 mal<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Malaria']),]
@@ -1825,24 +1862,24 @@ maxent_muscardiology<-maxent(ghana_envvars[[c(4,16,20,26)]],muscar,a=bg_BC,
                              path='MaxEntOutput/Musculoskeletal and cardiology')
 #Maxent with simple landcover
 maxent_muscardiology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],muscar,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=2.0',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Musculoskeletal and cardiology_simplelandcover')
+                                             
+                                             factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                             
+                                             args=c('betamultiplier=2.0',
+                                                    
+                                                    'linear=TRUE',
+                                                    
+                                                    'quadratic=TRUE',
+                                                    
+                                                    'hinge=TRUE',
+                                                    
+                                                    'threshold=FALSE',
+                                                    
+                                                    'product=FALSE',
+                                                    
+                                                    "-P","-J","replicates=5"),
+                                             
+                                             path='MaxEntOutput/Musculoskeletal and cardiology_simplelandcover')
 
 
 
@@ -1908,24 +1945,24 @@ maxent_neurology<-maxent(ghana_envvars[[c(4,16,20,26)]],neuro,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_neurology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],neuro,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=2.5',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Neurology_simplelandcover')
+                                         
+                                         factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                         
+                                         args=c('betamultiplier=2.5',
+                                                
+                                                'linear=TRUE',
+                                                
+                                                'quadratic=TRUE',
+                                                
+                                                'hinge=TRUE',
+                                                
+                                                'threshold=FALSE',
+                                                
+                                                'product=FALSE',
+                                                
+                                                "-P","-J","replicates=5"),
+                                         
+                                         path='MaxEntOutput/Neurology_simplelandcover')
 
 
 
@@ -1990,24 +2027,24 @@ maxent_oncology<-maxent(ghana_envvars[[c(4,16,20,26)]],onco,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_oncology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],onco,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=2.5',
-                                              
-                                              'linear=TRUE',
-                                              
-                                              'quadratic=TRUE',
-                                              
-                                              'hinge=FALSE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Oncology_simplelandcover')
+                                        
+                                        factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                        
+                                        args=c('betamultiplier=2.5',
+                                               
+                                               'linear=TRUE',
+                                               
+                                               'quadratic=TRUE',
+                                               
+                                               'hinge=FALSE',
+                                               
+                                               'threshold=FALSE',
+                                               
+                                               'product=FALSE',
+                                               
+                                               "-P","-J","replicates=5"),
+                                        
+                                        path='MaxEntOutput/Oncology_simplelandcover')
 
 
 #Merging Ophthalmology species with Gbif records
@@ -2071,24 +2108,24 @@ maxent_ophthalmology<-maxent(ghana_envvars[[c(4,16,20,26)]],opht,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_ophthalmology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],opht,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=2.0',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Ophthalmology_simplelandcover')
+                                             
+                                             factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                             
+                                             args=c('betamultiplier=2.0',
+                                                    
+                                                    'linear=FALSE',
+                                                    
+                                                    'quadratic=FALSE',
+                                                    
+                                                    'hinge=TRUE',
+                                                    
+                                                    'threshold=FALSE',
+                                                    
+                                                    'product=FALSE',
+                                                    
+                                                    "-P","-J","replicates=5"),
+                                             
+                                             path='MaxEntOutput/Ophthalmology_simplelandcover')
 
 
 ortho<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Orthopaedics']),]
@@ -2151,24 +2188,24 @@ maxent_orthopaedics<-maxent(ghana_envvars[[c(4,16,20,26)]],ortho,a=bg_BC,
                             path='MaxEntOutput/Orthopaedics')
 #Maxent with simple landcover
 maxent_orthopaedics_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],ortho,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=3.0',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Orthopaedics_simplelandcover')
+                                            
+                                            factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                            
+                                            args=c('betamultiplier=3.0',
+                                                   
+                                                   'linear=FALSE',
+                                                   
+                                                   'quadratic=FALSE',
+                                                   
+                                                   'hinge=TRUE',
+                                                   
+                                                   'threshold=FALSE',
+                                                   
+                                                   'product=FALSE',
+                                                   
+                                                   "-P","-J","replicates=5"),
+                                            
+                                            path='MaxEntOutput/Orthopaedics_simplelandcover')
 
 
 psyc<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Psychiatry']),]
@@ -2231,24 +2268,24 @@ maxent_psychiatry<-maxent(ghana_envvars[[c(4,16,20,26)]],psyc,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_psychiatry_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],psyc,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=4.0',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Psychiatry_simplelandcover')
+                                          
+                                          factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                          
+                                          args=c('betamultiplier=4.0',
+                                                 
+                                                 'linear=FALSE',
+                                                 
+                                                 'quadratic=FALSE',
+                                                 
+                                                 'hinge=TRUE',
+                                                 
+                                                 'threshold=FALSE',
+                                                 
+                                                 'product=FALSE',
+                                                 
+                                                 "-P","-J","replicates=5"),
+                                          
+                                          path='MaxEntOutput/Psychiatry_simplelandcover')
 
 
 obs<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Obstetrics and gynaecology']),]
@@ -2311,63 +2348,26 @@ maxent_obstetrics<-maxent(ghana_envvars[[c(4,16,20,26)]],obs,a=bg_BC,
 
 #Maxent with simple landcover
 maxent_obstetrics_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],obs,a=bg_BC,
-                                       
-                                       factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
-                                       
-                                       args=c('betamultiplier=3.0',
-                                              
-                                              'linear=FALSE',
-                                              
-                                              'quadratic=FALSE',
-                                              
-                                              'hinge=TRUE',
-                                              
-                                              'threshold=FALSE',
-                                              
-                                              'product=FALSE',
-                                              
-                                              "-P","-J","replicates=5"),
-                                       
-                                       path='MaxEntOutput/Obstetrics_simplelandcover')
+                                          
+                                          factors="simplelc2000",#ALSO CHANGE THIS TO THE NAME OF THE SIMPLE LANDCOVER VARIABLE
+                                          
+                                          args=c('betamultiplier=3.0',
+                                                 
+                                                 'linear=FALSE',
+                                                 
+                                                 'quadratic=FALSE',
+                                                 
+                                                 'hinge=TRUE',
+                                                 
+                                                 'threshold=FALSE',
+                                                 
+                                                 'product=FALSE',
+                                                 
+                                                 "-P","-J","replicates=5"),
+                                          
+                                          path='MaxEntOutput/Obstetrics_simplelandcover')
 
 
-#Making point plots of no.of species in categories vs AUC values
-#read in table
-categories<-read.csv('categories.csv')
-library("ggplot2")
-summary(categories)
-View(categories)
-ggplot (categories, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
-ggplot(categories, aes(x= No_sp, y= AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
-
-#Making point plots of no.of species in health care vs AUC values
-#read in table
-healthcare_groups<-read.csv('healthcare_groups.csv')
-summary(healthcare_groups)
-View(healthcare_groups)
-ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
-ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
-
-
-#Making points plots of no. of records in categories vs AUC values
-#read in table
-cat_records<-read.csv('cat_records.csv')
-summary(cat_records)
-View(cat_records)
-ggplot (cat_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
-ggplot(cat_records, aes(x= No_records, y= AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
-
-#Making points plots of no. of records in healthcare groups vs AUC values
-#read in table
-groups_records<-read.csv('groups_records.csv')
-summary(groups_records)
-View(groups_records)
-ggplot (groups_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
-ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.15, vjust=0.5)
 
 
 #MaxEnt models for each of the malaria spp ####---- 
@@ -2417,6 +2417,44 @@ hist(malariaspp$bio4.permutation.importance)
 hist(malariaspp$gpw2000_30_sec.permutation.importance)
 hist(malariaspp$simplelc2000.permutation.importance)
 
+#Making point plots of no.of species in categories vs AUC values
+#read in table
+categories<-read.csv('categories.csv')
+library("ggplot2")
+summary(categories)
+View(categories)
+ggplot (categories, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
+ggplot(categories, aes(x= No_sp, y= AUC, label=Categories))+
+  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+
+#Making point plots of no.of species in health care vs AUC values
+#read in table
+healthcare_groups<-read.csv('healthcare_groups.csv')
+summary(healthcare_groups)
+View(healthcare_groups)
+ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
+ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
+  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
+
+
+#Making points plots of no. of records in categories vs AUC values
+#read in table
+cat_records<-read.csv('cat_records.csv')
+summary(cat_records)
+View(cat_records)
+ggplot (cat_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
+ggplot(cat_records, aes(x= No_records, y= AUC, label=Categories))+
+  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+
+#Making points plots of no. of records in healthcare groups vs AUC values
+#read in table
+groups_records<-read.csv('groups_records.csv')
+summary(groups_records)
+View(groups_records)
+ggplot (groups_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
+ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
+  geom_point() +geom_text(aes(label=Groups),hjust=0.15, vjust=0.5)
+
 #Making point plots of area of convex hull in categories vs AUC values
 #read in table
 cat_hull<-read.csv('cat_hull.csv')
@@ -2437,3 +2475,21 @@ View(groups_hull)
 ggplot (groups_hull, aes(x=convex_hull.km.sq, y=AUC)) + geom_point (aes(x=convex_hull.km.sq, y=AUC))
 ggplot(groups_hull, aes(x=convex_hull.km.sq, y=AUC, label=Groups))+
   geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
+
+#Combine: categories, healthcare_groups, cat_records, groups_records
+# Packages
+library(grid)
+require(gridExtra)
+
+# Hashed out the code to make a 
+
+#GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
+#jpeg (GhanaMAPS, width=15, height=20, res=400, unit="cm")
+grid.arrange(categories, healthcare_groups, cat_records, groups_records, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),vp = grid::viewport(width=1.5,height=2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
+
+#Making summaries of AUC and variable contributions for all malaria species
+#Read in malaria species data
+MalariaSppMaxEntOutput<-read.csv('MalariaSppMaxEntOutput.csv')
+apply(malariaspp[,2:ncol(malariaspp)],2,mean)
+apply(malariaspp[,2:ncol(malariaspp)],2,sd)
+
