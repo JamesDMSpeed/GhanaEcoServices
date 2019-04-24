@@ -2418,64 +2418,111 @@ hist(malariaspp$bio4.permutation.importance)
 hist(malariaspp$gpw2000_30_sec.permutation.importance)
 hist(malariaspp$simplelc2000.permutation.importance)
 
+
+#### AUC scatter graph plots ####
+#### No.of species vs AUC values  in categories ####
 #Making point plots of no.of species in categories vs AUC values
 #read in table
 categories<-read.csv('categories.csv')
 library("ggplot2")
 summary(categories)
-View(categories)
-ggplot (categories, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
-ggplot(categories, aes(x= No_sp, y= AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+#View(categories)
+SppAUCCat<-ggplot (categories, aes(x=No_sp, y=AUC)) 
+SppAUCCat<-SppAUCCat+geom_point(size=3.5, shape=21, fill="white", stroke =1) 
+SppAUCCat<-SppAUCCat+geom_text(aes(label=Categories),hjust=-0.05, vjust=-0.85,size=3.5)
+SppAUCCat<-SppAUCCat+geom_text(x=310, y=0.81, label = "(a) Number of species across categories", size=4.5)
+SppAUCCat<-SppAUCCat+scale_x_continuous(limits = c(-19,1050), expand = c(0,0.5))
+SppAUCCat<-SppAUCCat+scale_y_continuous(limits = c(0.5,.815), expand = c(0,0))
+SppAUCCat<-SppAUCCat+ xlab("Number of species")+ylab("Area Under Curve (AUC)")
+SppAUCCat<-SppAUCCat+ theme_classic()
+SppAUCCat
 
+#### No.of species vs AUC values heathcare groups ####
 #Making point plots of no.of species in health care vs AUC values
 #read in table
 healthcare_groups<-read.csv('healthcare_groups.csv')
 summary(healthcare_groups)
-View(healthcare_groups)
-ggplot (healthcare_groups, aes(x=No_sp, y=AUC)) + geom_point (aes(x=No_sp, y=AUC))
-ggplot(healthcare_groups, aes(x= No_sp, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
+#View(healthcare_groups)
+SppAUCHealth<-ggplot (healthcare_groups, aes(x=No_sp, y=AUC))
+SppAUCHealth<-SppAUCHealth+geom_point(size=3.5, shape=21, fill="dark grey", colour="dark grey", stroke =1) 
+SppAUCHealth<-SppAUCHealth+geom_text(aes(label=Groups),hjust=-0.03, vjust=-0.85,size=3.5)
+SppAUCHealth<-SppAUCHealth+geom_text(x=72, y=0.815, label = "(b) Number of species in Health care", size=4.5)
+SppAUCHealth<-SppAUCHealth+scale_x_continuous(limits = c(-10,255), expand = c(0,0.35))
+SppAUCHealth<-SppAUCHealth+scale_y_continuous(limits = c(0.5,.82), expand = c(0,0))
+SppAUCHealth<-SppAUCHealth+xlab("Number of species")+ylab("")
+SppAUCHealth<-SppAUCHealth+ theme_classic()
+SppAUCHealth
 
-
+#### No. of records in categories vs AUC values ####
 #Making points plots of no. of records in categories vs AUC values
 #read in table
 cat_records<-read.csv('cat_records.csv')
 summary(cat_records)
-View(cat_records)
-ggplot (cat_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
-ggplot(cat_records, aes(x= No_records, y= AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+#View(cat_records)
+RecAUCCat<-ggplot (cat_records, aes(x=No_records, y=AUC)) 
+RecAUCCat<-RecAUCCat+geom_point(size=3.5, shape=21, fill="white", stroke =1) 
+RecAUCCat<-RecAUCCat+geom_text(aes(label=Categories),hjust=-0.05, vjust=-0.85,size=3.5)
+RecAUCCat<-RecAUCCat+geom_text(x=18500, y=0.795, label = "(c) Number of records across categories", size=4.5)
+RecAUCCat<-RecAUCCat+scale_x_continuous(limits = c(-500,61000), expand = c(0,0.35))
+RecAUCCat<-RecAUCCat+scale_y_continuous(limits = c(0.5,.8), expand = c(0,0))
+RecAUCCat<-RecAUCCat+ xlab("Number of records")+ylab("Area Under Curve (AUC)")
+RecAUCCat<-RecAUCCat+theme_classic()
+RecAUCCat
 
+#### No. of records in healthcare groups vs AUC value ####
 #Making points plots of no. of records in healthcare groups vs AUC values
 #read in table
 groups_records<-read.csv('groups_records.csv')
 summary(groups_records)
-View(groups_records)
-ggplot (groups_records, aes(x=No_records, y=AUC)) + geom_point (aes(x=No_records, y=AUC))
-ggplot(groups_records, aes(x= No_records, y= AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.15, vjust=0.5)
+#View(groups_records)
+RecAUCHealth<-ggplot (groups_records, aes(x=No_records, y=AUC))
+RecAUCHealth<-RecAUCHealth+geom_point(size=3.5, shape=21, fill="dark grey", colour="dark grey", stroke =1) 
+RecAUCHealth<-RecAUCHealth+geom_text(aes(label=Groups),hjust=-0.03, vjust=-0.85,size=3.5)
+RecAUCHealth<-RecAUCHealth+geom_text(x=4500, y=0.815, label = "(d) Number of records in Health care", size=4.5)
+RecAUCHealth<-RecAUCHealth+scale_x_continuous(limits = c(-100,15500), expand = c(0,0))
+RecAUCHealth<-RecAUCHealth+scale_y_continuous(limits = c(0.5,.82), expand = c(0,0))
+RecAUCHealth<-RecAUCHealth+xlab("Number of records")+ylab("")
+RecAUCHealth<-RecAUCHealth+theme_classic()
+RecAUCHealth
 
+#### Convex hull categories and AUC ####
 #Making point plots of area of convex hull in categories vs AUC values
 #read in table
+
 cat_hull<-read.csv('cat_hull.csv')
-library("ggplot2")
+names(cat_hull)
+library(scales)
 summary(cat_hull)
-View(cat_hull)
-ggplot (cat_hull, aes(x=convex_hull.km.sq, y=AUC)) + geom_point (aes(x=convex_hull, y=AUC))
-ggplot(cat_hull, aes(x=convex_hull, y=AUC, label=Categories))+
-  geom_point() +geom_text(aes(label=Categories),hjust=0.3, vjust=0.5)
+#View(cat_hull)
+cat_hull$Lconvex_hull.km<-log(cat_hull$convex_hull.km)
+HullAUCCat<-ggplot (cat_hull, aes(x=convex_hull.km, y=AUC)) 
+HullAUCCat<-HullAUCCat+geom_point(size=3.5, shape=21, fill="white", stroke =1) 
+HullAUCCat<-HullAUCCat+geom_text(aes(label=Categories),hjust=0.9, vjust=-0.85,size=3.5)
+HullAUCCat<-HullAUCCat+geom_text(x=54000, y=0.81, label = "(e) Area across categories", size=4.5)
+HullAUCCat<-HullAUCCat+scale_x_continuous(limits = c(0,270000), expand = c(0,0))
+HullAUCCat<-HullAUCCat+scale_y_continuous(limits = c(0.5,.815), expand = c(0,0))
+HullAUCCat<-HullAUCCat+xlab("Area (km sq)")+ylab("Area Under Curve (AUC)")
+HullAUCCat<-HullAUCCat+theme_classic()
+HullAUCCat
 
 
+#### Convex hull health care and AUC ####
 #Making point plots of area of convex hull in healthcare groups vs AUC values
 #read in table
 groups_hull<-read.csv('groups_hull.csv')
 library("ggplot2")
 summary(groups_hull)
-View(groups_hull)
-ggplot (groups_hull, aes(x=convex_hull.km.sq, y=AUC)) + geom_point (aes(x=convex_hull.km.sq, y=AUC))
-ggplot(groups_hull, aes(x=convex_hull.km.sq, y=AUC, label=Groups))+
-  geom_point() +geom_text(aes(label=Groups),hjust=0.3, vjust=0.5)
+names(groups_hull)
+HullAUCHealth<-ggplot (groups_hull, aes(x=convex_hull.km.sq, y=AUC)) 
+HullAUCHealth<-HullAUCHealth+geom_point(size=3.5, shape=21, fill="dark grey", colour="dark grey", stroke =1) 
+HullAUCHealth<-HullAUCHealth+geom_text(aes(label=Groups),hjust=0.9, vjust=-0.85,size=3.5)
+HullAUCHealth<-HullAUCHealth+geom_text(x=56000, y=0.815, label = "(f) Area across Health care", size=4.5)
+HullAUCHealth<-HullAUCHealth+scale_x_continuous(limits = c(0,270000), expand = c(0,0))
+HullAUCHealth<-HullAUCHealth+scale_y_continuous(limits = c(0.5,.82), expand = c(0,0))
+HullAUCHealth<-HullAUCHealth+xlab("Area (km sq)")+ylab("")
+HullAUCHealth<-HullAUCHealth+theme_classic()
+HullAUCHealth
+
 
 #Combine: categories, healthcare_groups, cat_records, groups_records
 # Packages
@@ -2486,7 +2533,16 @@ require(gridExtra)
 
 #GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
 #jpeg (GhanaMAPS, width=15, height=20, res=400, unit="cm")
-grid.arrange(categories, healthcare_groups, cat_records, groups_records, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),vp = grid::viewport(width=1.5,height=2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
+grid.arrange(SppAUCCat,SppAUCHealth, RecAUCCat, RecAUCHealth,HullAUCCat,HullAUCHealth,
+widths=c(1,1), heights=c(1,1,1),
+layout_matrix = cbind(c(1,3,5), c(2,4,6)))
+
+filename <- paste0("AUC.spp.records.area", "_",Sys.Date(), ".jpeg" )
+jpeg (filename, width=30, height=32, res=400, unit="cm")
+grid.arrange(SppAUCCat,SppAUCHealth, RecAUCCat, RecAUCHealth,HullAUCCat,HullAUCHealth,
+             widths=c(1,1), heights=c(1,1,1),
+             layout_matrix = cbind(c(1,3,5), c(2,4,6)))
+dev.off()
 
 #Making summaries of AUC and variable contributions for all malaria species
 #Read in malaria species data
@@ -2494,7 +2550,7 @@ MalariaSppMaxEntOutput<-read.csv('MalariaSppMaxEntOutput.csv')
 apply(malariaspp[,2:ncol(malariaspp)],2,mean)
 apply(malariaspp[,2:ncol(malariaspp)],2,sd)
 
-=======
+##########################################################################################
 #Ghana plants
 rm(list=ls())#Clean workspace
 #Install packages
