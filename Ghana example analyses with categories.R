@@ -185,8 +185,15 @@ levels(ghanalc1975_simple)
 #Do the same with other years too
 #Using lc2000 for maxent modelling
 lc2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2000lulc_2km.tif')
+utmprojGhana<-"+proj=utm +north +zone=30 +ellps=WGS84"
+crs(lc2000) # This is not WGS84 formatted! # '+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs'
 ghanat<-spTransform(ghanamap,crs(lc2000))
 ghanalc2000<-mask(crop(lc2000,ghanat),ghanat)
+crs(ghanalc2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
+ghanalc2000
+
+# Project Raster
+ghanalc2000 <- projectRaster(ghanalc2000, crs = "+proj=longlat +datum=WGS84")
 
 #checking table that describes the different values associated with the values
 ghanalc2000@data@attributes[[1]][,1:5]
@@ -232,7 +239,7 @@ ghanalc2000_simple[ghanalc2000_simple==99]<-6
 
 #Checking summary of simplified habitat areas
 ghanalc2000_simple@data@attributes
-ghanalc2000_simple
+ghanalc2000_simple # This is not WGS84 format
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
 
@@ -251,6 +258,12 @@ ghanat<-spTransform(ghanamap,crs(lc2013))
 ghanalc2013<-mask(crop(lc2013,ghanat),ghanat)
 plot(ghanalc2013)
 levels(ghanalc2013)
+crs(ghanalc2013)<-"+proj=utm +north +zone=30 +ellps=WGS84"
+ghanalc2013
+
+# Project Raster
+ghanalc2013 <- projectRaster(ghanalc2013, crs = "+proj=longlat +datum=WGS84")
+
 #checking table that describes the different values associated with the values
 ghanalc2013@data@attributes[[1]][,1:5]
 
@@ -299,6 +312,9 @@ ghanalc2013_simple
 summary(as.factor(ghanalc2013_simple))
 summary(as.factor(getValues(ghanalc2013_simple)))
 
+GhanaLand2013<-levelplot(ghanalc2013_simple,margin=F,main='Land cover 2013',par.settings='BTCTheme')
+GhanaLand2013<-GhanaLand2013+layer(sp.polygons(ghanamap))
+GhanaLand2013
 
 #Cropping Ghana from Global population density data
 pd2000<-raster('human population data/gpw2000_30_sec.tif')
