@@ -1,0 +1,5 @@
+"","species","AUC","bio16.contribution","bio4.contribution","gpw2000_30_sec.contribution","simplelc2000.contribution","bio16.permutation.importance","bio4.permutation.importance","gpw2000_30_sec.permutation.importance","simplelc2000.permutation.importance"
+"1","Eclipta alba",0.7853,0.7279,1.3932,5.753,92.1259,1.2273,16.3452,3.3612,79.0663
+"2","Pterocarpus erinaceus",0.6851,35.533,15.9073,6.6295,41.9303,53.3788,38.1411,2.2305,6.2496
+"3","Terminalia avicennioides",0.8568,1.5239,86.8963,0.0122,11.5676,2.6266,92.2291,0,5.1444
+"4","Uvaria ovata",0.8772,24.9982,11.4371,0.4536,63.1111,54.792,37.2565,0.5788,7.3727

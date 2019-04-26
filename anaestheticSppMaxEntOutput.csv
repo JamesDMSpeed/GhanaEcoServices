@@ -1,0 +1,13 @@
+"","species","AUC","bio16.contribution","bio4.contribution","gpw2000_30_sec.contribution","simplelc2000.contribution","bio16.permutation.importance","bio4.permutation.importance","gpw2000_30_sec.permutation.importance","simplelc2000.permutation.importance"
+"1","Bauhinia thonningii",0.7321,34.4531,30.5842,0,34.9627,43.6403,42.1901,0,14.1696
+"2","Cassia sieberiana",0.68,61.1316,0.4818,0,38.3866,77.44,18.5951,0,3.9649
+"3","Cola gigantea",0.7562,0.2645,23.1016,0.0366,76.5973,2.7388,0,1.2024,96.0588
+"4","Combretum adenogonium",0.715,14.6014,73.7686,0.7796,10.8503,2.3579,95.8771,1.7651,0
+"5","Corchorus olitorius",0.768,93.0337,0,0,6.9663,37.4818,0,0,62.5182
+"6","Diospyros mespiliformis",0.7791,33.7297,63.9101,0,2.3602,36.5633,59.1011,0,4.3356
+"7","Griffonia simplicifolia",0.8122,1.2044,21.8441,15.8951,61.0564,7.5433,9.5812,18.2166,64.6589
+"8","Milicia excelsa",0.7506,2.3728,85.4161,2.64,9.571,5.864,85.8585,3.4413,4.8362
+"9","Monodora myristica",0.7918,1.2902,79.9953,0.0276,18.6869,0,95.8134,0.2326,3.954
+"10","Parkia biglobosa",0.6964,47.2493,1.7077,18.0139,33.029,77.517,20.582,1.9011,0
+"11","Trichilia monadelpha",0.7966,0,52.5933,1.1264,46.2804,0,70.9899,2.8121,26.1981
+"12","Vitellaria paradoxa",0.797,0,13.6431,0,86.3569,0,34.7246,0,65.2754

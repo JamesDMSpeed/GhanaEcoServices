@@ -1,0 +1,6 @@
+"","species","AUC","bio16.contribution","bio4.contribution","gpw2000_30_sec.contribution","simplelc2000.contribution","bio16.permutation.importance","bio4.permutation.importance","gpw2000_30_sec.permutation.importance","simplelc2000.permutation.importance"
+"1","Azadirachta indica",0.7585,0,0,4.8126,95.1874,0,0,10.5137,89.4863
+"2","Burkea africana",0.7951,1.6218,67.6503,14.1989,16.5289,13.749,64.1646,9.348,12.7384
+"3","Prosopis africana",0.7668,0,100,0,0,0,100,0,0
+"4","Pseudocedrela kotschyi",0.7598,30.9892,23.0541,41.1324,4.8242,51.9979,15.1358,32.8663,0
+"5","Ximenia americana",0.7474,4.9675,83.9999,9.2501,1.7825,2.7658,87.6404,7.2788,2.315

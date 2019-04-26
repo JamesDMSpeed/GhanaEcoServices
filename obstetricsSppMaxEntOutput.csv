@@ -1,0 +1,14 @@
+"","species","AUC","bio16.contribution","bio4.contribution","gpw2000_30_sec.contribution","simplelc2000.contribution","bio16.permutation.importance","bio4.permutation.importance","gpw2000_30_sec.permutation.importance","simplelc2000.permutation.importance"
+"1","Adansonia digitata",0.7541,0,99.981,0,0.019,0,99.0033,0,0.9967
+"2","Berlinia confusa",0.8494,0.4472,22.3645,0.2858,76.9025,1.0443,40.4769,0.0987,58.3801
+"3","Drypetes floribunda",0.8292,97.6044,0,0,2.3956,98.4143,0,0,1.5857
+"4","Ficus sur",0.6066,12.5634,15.2434,0.196,71.9971,20.1413,23.832,4.0571,51.9696
+"5","Ipomoea eriocarpa",0.6599,0,5.0627,0,94.9373,0,0,0,100
+"6","Lecaniodiscus cupanioides",0.6982,22.9277,64.0341,0.0518,12.9864,14.3997,73.4981,0.129,11.9732
+"7","Momordica charantia",0.8173,0,69.875,0,30.125,0,75.3325,0,24.6675
+"8","Monodora myristica",0.7918,1.2902,79.9953,0.0276,18.6869,0,95.8134,0.2326,3.954
+"9","Pouteria alnifolia",0.7558,69.4378,5.1927,0.302,25.0675,62.0074,17.3897,0.8844,19.7185
+"10","Sorghum bicolor",0.8283,0.8634,98.0793,0.008,1.0493,0.8067,98.1727,0,1.0205
+"11","Triplochiton scleroxylon",0.792,11.8837,25.0455,0.2883,62.7825,36.3758,29.4033,0.3369,33.8841
+"12","Vitellaria paradoxa",0.797,0,13.6431,0,86.3569,0,34.7246,0,65.2754
+"13","Zanthoxylum zanthoxyloides",0.7126,72.8625,0,6.4399,20.6976,97.1426,0,1.5855,1.2719
