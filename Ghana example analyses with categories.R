@@ -61,8 +61,26 @@ ghanamap_ras<-rasterize(ghanamap, r)
 
 # Levelplot for species points
 myTheme <- BTCTheme()
+my.padding <- list(myTheme, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+myTheme <- BTCTheme()
 myTheme$regions$col = c('white')
-GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=NULL,par.settings="myTheme") #scales = list(draw = FALSE)
+
+my.padding$regions$col = c('white')
+GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=T,par.settings="myTheme") #scales = list(draw = FALSE)
 GhanaSpp<-GhanaSpp+layer(sp.polygons(ghanamap))
 GhanaSpp<-GhanaSpp+layer(sp.points(ghana_species_pts_insidemap, pch =3, cex =.25, fill="green",col="green"))
 GhanaSpp
@@ -89,9 +107,6 @@ with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length)
 
 #KML(ghana_species_pts_insidemap,'KMLGBIFrecords')
 
-
-
-
 # Example MaxEnt model ----------------------------------------------------
 
 #Elevation data
@@ -104,9 +119,25 @@ levelplot(ghanaalt,margin=F,main='Elevation (m)')+
 #2.5minute resolution is ca.4.5km at equator
 gc1<-getData('worldclim',var='bio',res=2.5)
 #Crop and mask to elevation data
+myTheme2 <- RdBuTheme()
+my.padding2 <- list(myTheme2, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
 ghanaC<-crop(gc1,ghanamap)
 ghana1<-mask(ghanaC,ghanamap)
-GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')
+GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings="RdBuTheme")
 GhanaRain<-GhanaRain+layer(sp.polygons(ghanamap))
 GhanaRain
 
@@ -187,13 +218,9 @@ levels(ghanalc1975_simple)
 lc2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2000lulc_2km.tif')
 utmprojGhana<-"+proj=utm +north +zone=30 +ellps=WGS84"
 crs(lc2000) # This is not WGS84 formatted! # '+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs'
+lc2000<-projectRaster(lc2000, crs = "+proj=longlat +datum=WGS84")
 ghanat<-spTransform(ghanamap,crs(lc2000))
 ghanalc2000<-mask(crop(lc2000,ghanat),ghanat)
-crs(ghanalc2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
-ghanalc2000
-
-# Project Raster
-ghanalc2000 <- projectRaster(ghanalc2000, crs = "+proj=longlat +datum=WGS84")
 
 #checking table that describes the different values associated with the values
 ghanalc2000@data@attributes[[1]][,1:5]
@@ -243,7 +270,23 @@ ghanalc2000_simple # This is not WGS84 format
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
 
-GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings='BTCTheme')
+myTheme3 <- BTCTheme()
+my.padding3 <- list(myTheme3, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings="BTCTheme")
 GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap))
 GhanaLand2000
 
@@ -317,13 +360,31 @@ GhanaLand2013<-GhanaLand2013+layer(sp.polygons(ghanamap))
 GhanaLand2013
 
 #Cropping Ghana from Global population density data
-pd2000<-raster('human population data/gpw2000_30_sec.tif')
+pd2000<-raster('GhanaPopData.grd')
 pd2000ghana1<-crop(pd2000,ghanamap)
 pd2000ghana<-mask(pd2000ghana1,ghanamap)
+str(pd2000ghana)
+pd2000ghana@data@values<-log10(pd2000ghana@data@values)
 
-pd2000ghana<-levelplot(pd2000ghana,margin=F,main='Population density',par.settings='YlOrRdTheme')
-pd2000ghana<-pd2000ghana+layer(sp.polygons(ghanamap))
-pd2000ghana
+myTheme4 <- YlOrRdTheme()
+my.padding4 <- list(myTheme4, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+pd2000ghana2<-levelplot(pd2000ghana,margin=F,main='Log Population density',par.settings="YlOrRdTheme")
+pd2000ghana2<-pd2000ghana2+layer(sp.polygons(ghanamap))
+pd2000ghana2
 
 pd2005<-raster('human population data/gpw2005_30_sec.tif')
 pd2005ghana1<-crop(pd2005,ghanamap)
@@ -361,12 +422,13 @@ ghanapopdat<-stack('GhanaPopData')
 library(grid)
 require(gridExtra)
 
-# Hashed out the code to make a 
+#### Ghana maps ####
+GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
+jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
+grid.arrange(GhanaSpp, GhanaRain, GhanaLand2000, pd2000ghana2, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
+dev.off()
+#vp = grid::viewport(width=1.5,height=2)
 
-#GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
-#jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
-grid.arrange(GhanaSpp, GhanaRain, GhanaLand2000, pd2000ghana, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),vp = grid::viewport(width=1.5,height=2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
-#dev.off()
 
 #Stack up lcdata
 lcdat<-stack(ghanalc1975, ghanalc2000, ghanalc2013, ghanalc1975_simple,ghanalc2000_simple,ghanalc2013_simple)
