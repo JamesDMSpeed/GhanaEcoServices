@@ -2624,56 +2624,114 @@ dev.off()
 
 #Making summaries of AUC and variable contributions for all species in categories and groups
 #Read in species data
-MalariaSppMaxEntOutput<-read.csv('MalariaSppMaxEntOutput.csv')
-summary(malariaspp)
+malariaspp<-read.csv('MalariaSppMaxEntOutput.csv')
+agricspp<-read.csv('AgricSppMaxEntOutput.csv')
+anaestheticspp<-read.csv('anaestheticSppMaxEntOutput.csv')
+dentistryspp<-read.csv('dentistrySppMaxEntOutput.csv')
+dermatologyspp<-read.csv('dermatologySppMaxEntOutput.csv')
+endocrinologyspp<-read.csv('endocrinologySppMaxEntOutput.csv')
+excipientspp<-read.csv('excipientSppMaxEntOutput.csv')
+orthopaedicsspp<-read.csv('orthopaedicsSppMaxEntOutput.csv')
+psychiatryspp<-read.csv('psychiatrySppMaxEntOutput.csv')
+feverspp<-read.csv('feverSppMaxEntOutput.csv')
+healthcarespp<-read.csv('HealthcareSppMaxEntOutput.csv')
+immunologyspp<-read.csv('immunologySppMaxEntOutput.csv')
+infertilityspp<-read.csv('infertilitySppMaxEntOutput.csv')
+muscardiologyspp<-read.csv('muscardiologySppMaxEntOutput.csv')
+neurologyspp<-read.csv('neurologySppMaxEntOutput.csv')
+obstetricsspp<-read.csv('obstetricsSppMaxEntOutput.csv')
+oncologyspp<-read.csv('oncologySppMaxEntOutput.csv')
+ophthalmologyspp<-read.csv('ophthalmologySppMaxEntOutput.csv')
 
-AgricSppMaxEntOutput<-read.csv('AgricSppMaxEntOutput.csv')
-summary(agricspp)
+# Add coloumn for ecoservices
+malariaspp$ecoservices<-"malaria"
+agricspp$ecoservices<-"agriculture"
+anaestheticspp$ecoservices<-"anaesthetic"
+dentistryspp$ecoservices<-"dentistry"
+dermatologyspp$ecoservices<-"dermatology"
+endocrinologyspp$ecoservices<-"endocrinology"
+excipientspp$ecoservices<-"excipient"
+orthopaedicsspp$ecoservices<-"orthopaedics"
+psychiatryspp$ecoservices<-"psychiatry"
+feverspp$ecoservices<-"fever"
+healthcarespp$ecoservices<-"healthcare"
+immunologyspp$ecoservices<-"immunology"
+infertilityspp$ecoservices<-"infertility"
+muscardiologyspp$ecoservices<-"muscardiology"
+neurologyspp$ecoservices<-"neurology"
+obstetricsspp$ecoservices<-"obstetrics"
+oncologyspp$ecoservices<-"oncology"
+ophthalmologyspp$ecoservices<-"ophthalmology"
 
-anaestheticSppMaxEntOutput<-read.csv('anaestheticSppMaxEntOutput.csv')
-summary(anaestheticspp)
+#Cbind datasets
+EcoSerModSum<-rbind(malariaspp,agricspp,anaestheticspp,dentistryspp,dermatologyspp,
+endocrinologyspp,excipientspp,orthopaedicsspp,psychiatryspp,feverspp,
+healthcarespp,immunologyspp,infertilityspp,muscardiologyspp,neurologyspp,
+obstetricsspp,oncologyspp,ophthalmologyspp)
 
-dentistrySppMaxEntOutput<-read.csv('dentistrySppMaxEntOutput.csv')
-summary(dentistryspp)
 
-dermatologySppMaxEntOutput<-read.csv('dermatologySppMaxEntOutput.csv')
-summary(dermatologyspp)
+# Mean points for each category
 
-endocrinologySppMaxEntOutput<-read.csv('endocrinologySppMaxEntOutput.csv')
-summary(endocrinologyspp)
+TempMean<-aggregate(bio4.contribution~ecoservices,EcoSerModSum,mean)
+PrecipMean<-aggregate(bio16.contribution~ecoservices,EcoSerModSum,mean)
+PopMean<-aggregate(gpw2000_30_sec.contribution~ecoservices,EcoSerModSum,mean)
+LCMean<-aggregate(simplelc2000.contribution~ecoservices,EcoSerModSum,mean)
 
-excipientSppMaxEntOutput<-read.csv('excipientSppMaxEntOutput.csv')
-summary(excipientspp)
+# Boxplots
+library(ggplot2)
+names(EcoSerModSum)
 
-orthopaedicsSppMaxEntOutput<-read.csv('orthopaedicsSppMaxEntOutput.csv')
-summary(orthopaedicsspp)
+# Eco Service explained by temperature
+EcoSerTemp<-ggplot(EcoSerModSum, aes(x=ecoservices, y=bio4.contribution))
+EcoSerTemp<-EcoSerTemp+geom_boxplot()
+EcoSerTemp<-EcoSerTemp+geom_point(data=TempMean, size=3.5, fill="red",colour="red")
+EcoSerTemp<-EcoSerTemp+xlab("")+ylab("Contribution (%)")
+EcoSerTemp<-EcoSerTemp+geom_text(x=4,y=98, label="(a) Temperature")
+EcoSerTemp<-EcoSerTemp+scale_y_continuous(limits=c(0,100), expand=c(0,0))
+EcoSerTemp<-EcoSerTemp+theme_classic()
+EcoSerTemp<-EcoSerTemp+theme(axis.text.x =  element_blank())
+EcoSerTemp
 
-psychiatrySppMaxEntOutput<-read.csv('psychiatrySppMaxEntOutput.csv')
-summary(psychiatryspp)
+# Eco Service explained by precipitation
+EcoSerPrecip<-ggplot(EcoSerModSum, aes(x=ecoservices, y=bio16.contribution))
+EcoSerPrecip<-EcoSerPrecip+geom_boxplot()
+EcoSerPrecip<-EcoSerPrecip+geom_point(data=PrecipMean, size=3.5, fill="red",colour="red")
+EcoSerPrecip<-EcoSerPrecip+xlab("")+ylab("")
+EcoSerPrecip<-EcoSerPrecip+geom_text(x=4,y=98, label="(b) Precipitation")
+EcoSerPrecip<-EcoSerPrecip+scale_y_continuous(limits=c(0,100), expand=c(0,0))
+EcoSerPrecip<-EcoSerPrecip+theme_classic()
+EcoSerPrecip<-EcoSerPrecip+theme(axis.text.x =  element_blank())
+EcoSerPrecip
 
-feverSppMaxEntOutput<-read.csv('feverSppMaxEntOutput.csv')
-summary(feverspp)
+# Eco Service explained by human population
+EcoSerPop<-ggplot(EcoSerModSum, aes(x=ecoservices, y=gpw2000_30_sec.contribution))
+EcoSerPop<-EcoSerPop+geom_boxplot()
+EcoSerPop<-EcoSerPop+geom_point(data=PopMean, size=3.5, fill="red",colour="red")
+EcoSerPop<-EcoSerPop+xlab("Category")+ylab("Contribution (%)")
+EcoSerPop<-EcoSerPop+geom_text(x=5,y=98, label="(c) Human population")
+EcoSerPop<-EcoSerPop+scale_y_continuous(limits=c(0,100), expand=c(0,0))
+EcoSerPop<-EcoSerPop+theme_classic()
+EcoSerPop<-EcoSerPop+theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.2))
+EcoSerPop
 
-HealthcareSppMaxEntOutput<-read.csv('HealthcareSppMaxEntOutput.csv')
-summary(healthcarespp)
+# Eco Service explained by land cover
+EcoSerLcov<-ggplot(EcoSerModSum, aes(x=ecoservices, y=simplelc2000.contribution))
+EcoSerLcov<-EcoSerLcov+geom_boxplot()
+EcoSerLcov<-EcoSerLcov+geom_point(data=LCMean, size=3.5, fill="red",colour="red")
+EcoSerLcov<-EcoSerLcov+xlab("Category")+ylab("")
+EcoSerLcov<-EcoSerLcov+geom_text(x=5,y=98, label="(d) Human landcover")
+EcoSerLcov<-EcoSerLcov+scale_y_continuous(limits=c(0,100), expand=c(0,0))
+EcoSerLcov<-EcoSerLcov+theme_classic()
+EcoSerLcov<-EcoSerLcov+theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.2))
+EcoSerLcov
 
-immunologySppMaxEntOutput<-read.csv('immunologySppMaxEntOutput.csv')
-summary(immunologyspp)
+# Combine plots
+library(egg)
+egg::ggarrange(EcoSerTemp,EcoSerPrecip,EcoSerPop,EcoSerLcov, ncol=2, nrow=2) #common.legend = T)
 
-infertilitySppMaxEntOutput<-read.csv('infertilitySppMaxEntOutput.csv')
-summary(infertilityspp)
+#### Temp, precip, Pop, Lcov maps ####
+ModImport <- paste0("ModImport", "_",Sys.Date(), ".jpeg" )
+jpeg (ModImport, width=20, height=20, res=400, unit="cm")
+egg::ggarrange(EcoSerTemp,EcoSerPrecip,EcoSerPop,EcoSerLcov, ncol=2, nrow=2) #common.legend = T)
+dev.off()
 
-muscardiologySppMaxEntOutput<-read.csv('muscardiologySppMaxEntOutput.csv')
-summary(muscardiologyspp)
-
-neurologySppMaxEntOutput<-read.csv('neurologySppMaxEntOutput.csv')
-summary(neurologyspp)
-
-obstetricsSppMaxEntOutput<-read.csv('obstetricsSppMaxEntOutput.csv')
-summary(obstetricsspp)
-
-oncologySppMaxEntOutput<-read.csv('oncologySppMaxEntOutput.csv')
-summary(oncologyspp)
-
-ophthamologySppMaxEntOutput<-read.csv('ophthalmologySppMaxEntOutput.csv')
-summary(ophthalmologyspp)
