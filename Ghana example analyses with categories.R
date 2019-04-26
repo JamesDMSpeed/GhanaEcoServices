@@ -78,9 +78,8 @@ my.padding <- list(myTheme, layout.heights = list(
 
 myTheme <- BTCTheme()
 myTheme$regions$col = c('white')
-
 my.padding$regions$col = c('white')
-GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=T,par.settings="myTheme") #scales = list(draw = FALSE)
+GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=F,par.settings=myTheme) #scales = list(draw = FALSE)
 GhanaSpp<-GhanaSpp+layer(sp.polygons(ghanamap))
 GhanaSpp<-GhanaSpp+layer(sp.points(ghana_species_pts_insidemap, pch =3, cex =.25, fill="green",col="green"))
 GhanaSpp
@@ -425,7 +424,7 @@ require(gridExtra)
 #### Ghana maps ####
 GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
 jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
-grid.arrange(GhanaSpp, GhanaRain, GhanaLand2000, pd2000ghana2, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
+grid.arrange(GhanaRain, GhanaLand2000, pd2000ghana2, ncol=3, nrow=1, widths=c(1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3)))
 dev.off()
 #vp = grid::viewport(width=1.5,height=2)
 
