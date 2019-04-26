@@ -1,4 +1,4 @@
-HEAD
+<<<<<<< HEAD
 #Ghana plants
 rm(list=ls())#Clean workspace
 #Install packages
@@ -61,8 +61,25 @@ ghanamap_ras<-rasterize(ghanamap, r)
 
 # Levelplot for species points
 myTheme <- BTCTheme()
+my.padding <- list(myTheme, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+myTheme <- BTCTheme()
 myTheme$regions$col = c('white')
-GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=NULL,par.settings="myTheme") #scales = list(draw = FALSE)
+my.padding$regions$col = c('white')
+GhanaSpp<-levelplot(ghanamap_ras,main='Species records',margin=F, colorkey=F,par.settings=myTheme) #scales = list(draw = FALSE)
 GhanaSpp<-GhanaSpp+layer(sp.polygons(ghanamap))
 GhanaSpp<-GhanaSpp+layer(sp.points(ghana_species_pts_insidemap, pch =3, cex =.25, fill="green",col="green"))
 GhanaSpp
@@ -89,9 +106,6 @@ with(ghana_species_pts_insidemap@data,tapply(basisOfRecord,basisOfRecord,length)
 
 #KML(ghana_species_pts_insidemap,'KMLGBIFrecords')
 
-
-
-
 # Example MaxEnt model ----------------------------------------------------
 
 #Elevation data
@@ -104,9 +118,25 @@ levelplot(ghanaalt,margin=F,main='Elevation (m)')+
 #2.5minute resolution is ca.4.5km at equator
 gc1<-getData('worldclim',var='bio',res=2.5)
 #Crop and mask to elevation data
+myTheme2 <- RdBuTheme()
+my.padding2 <- list(myTheme2, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
 ghanaC<-crop(gc1,ghanamap)
 ghana1<-mask(ghanaC,ghanamap)
-GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings='RdBuTheme')
+GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings="RdBuTheme")
 GhanaRain<-GhanaRain+layer(sp.polygons(ghanamap))
 GhanaRain
 
@@ -187,13 +217,9 @@ levels(ghanalc1975_simple)
 lc2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2000lulc_2km.tif')
 utmprojGhana<-"+proj=utm +north +zone=30 +ellps=WGS84"
 crs(lc2000) # This is not WGS84 formatted! # '+proj=utm +zone=30 +datum=WGS84 +units=m +no_defs'
+lc2000<-projectRaster(lc2000, crs = "+proj=longlat +datum=WGS84")
 ghanat<-spTransform(ghanamap,crs(lc2000))
 ghanalc2000<-mask(crop(lc2000,ghanat),ghanat)
-crs(ghanalc2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
-ghanalc2000
-
-# Project Raster
-ghanalc2000 <- projectRaster(ghanalc2000, crs = "+proj=longlat +datum=WGS84")
 
 #checking table that describes the different values associated with the values
 ghanalc2000@data@attributes[[1]][,1:5]
@@ -243,7 +269,23 @@ ghanalc2000_simple # This is not WGS84 format
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
 
-GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings='BTCTheme')
+myTheme3 <- BTCTheme()
+my.padding3 <- list(myTheme3, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings="BTCTheme")
 GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap))
 GhanaLand2000
 
@@ -317,13 +359,31 @@ GhanaLand2013<-GhanaLand2013+layer(sp.polygons(ghanamap))
 GhanaLand2013
 
 #Cropping Ghana from Global population density data
-pd2000<-raster('human population data/gpw2000_30_sec.tif')
+pd2000<-raster('GhanaPopData.grd')
 pd2000ghana1<-crop(pd2000,ghanamap)
 pd2000ghana<-mask(pd2000ghana1,ghanamap)
+str(pd2000ghana)
+pd2000ghana@data@values<-log10(pd2000ghana@data@values)
 
-pd2000ghana<-levelplot(pd2000ghana,margin=F,main='Population density',par.settings='YlOrRdTheme')
-pd2000ghana<-pd2000ghana+layer(sp.polygons(ghanamap))
-pd2000ghana
+myTheme4 <- YlOrRdTheme()
+my.padding4 <- list(myTheme4, layout.heights = list(
+  top.padding = 1, 
+  main.key.padding = 1, 
+  key.axis.padding = 1, 
+  axis.xlab.padding = 1, 
+  xlab.key.padding = 1, 
+  key.sub.padding = 1), 
+  layout.widths = list( 
+    left.padding = 1, 
+    key.ylab.padding = 1, 
+    ylab.axis.padding = 1, 
+    axis.key.padding = 1, 
+    right.padding = 1) 
+) 
+
+pd2000ghana2<-levelplot(pd2000ghana,margin=F,main='Log Population density',par.settings="YlOrRdTheme")
+pd2000ghana2<-pd2000ghana2+layer(sp.polygons(ghanamap))
+pd2000ghana2
 
 pd2005<-raster('human population data/gpw2005_30_sec.tif')
 pd2005ghana1<-crop(pd2005,ghanamap)
@@ -361,12 +421,13 @@ ghanapopdat<-stack('GhanaPopData')
 library(grid)
 require(gridExtra)
 
-# Hashed out the code to make a 
+#### Ghana maps ####
+GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
+jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
+grid.arrange(GhanaRain, GhanaLand2000, pd2000ghana2, ncol=3, nrow=1, widths=c(1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3)))
+dev.off()
+#vp = grid::viewport(width=1.5,height=2)
 
-#GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
-#jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
-grid.arrange(GhanaSpp, GhanaRain, GhanaLand2000, pd2000ghana, ncol=4, nrow=1, widths=c(1.5,1.5,1.5,1.5), heights=c(2),vp = grid::viewport(width=1.5,height=2),layout_matrix = cbind(c(1), c(2),c(3), c(4)))
-#dev.off()
 
 #Stack up lcdata
 lcdat<-stack(ghanalc1975, ghanalc2000, ghanalc2013, ghanalc1975_simple,ghanalc2000_simple,ghanalc2013_simple)
@@ -383,7 +444,6 @@ lcdatrs<-resample(lcdatp,ghana1,method="ngb")#Nearest neighbour as categorical
 
 ghana_envvars<-stack(ghana1,mask(ghanapopdat,ghana1[[1]]),mask(lcdatrs,ghana1[[1]]))
 names(ghana_envvars)
-
 
 #Merging health care with gbif recs to a data frame 
 healthcare_gbif<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Category=='Health care']),]
@@ -2065,7 +2125,7 @@ maxent_oncology_simplelandcover<-maxent(ghana_envvars[[c(4,16,20,29)]],onco,a=bg
                                         path='MaxEntOutput/Oncology_simplelandcover')
 
 
-#Merging ophthalmology species with Gbif records
+#Merging Ophthalmology species with Gbif records
 opht<-ghana_species_pts_insidemap[which(ghana_species_pts_insidemap$species%in%GhanaUses$ConfirmedSppNames[GhanaUses$Group=='Medicine: Ophthalmology']),]
 dim(opht)
 
@@ -2434,864 +2494,6 @@ hist(malariaspp$bio16.permutation.importance)
 hist(malariaspp$bio4.permutation.importance)
 hist(malariaspp$gpw2000_30_sec.permutation.importance)
 hist(malariaspp$simplelc2000.permutation.importance)
-
-
-#MaxEnt models for each of the agriculture spp ####---- 
-agricult_gbifspp<-levels(droplevels(agricult_gbif$species))
-agricult_gbifspp<-agricult_gbifspp[tapply(agricult_gbif$species,droplevels(agricult_gbif$species),length)>15]
-agricspp<-data.frame(species=agricult_gbifspp,AUC=rep(NA,times=length(agricult_gbifspp)),
-                     bio16.contribution=rep(NA,times=length(agricult_gbifspp)),
-                     bio4.contribution=rep(NA,times=length(agricult_gbifspp)),
-                     gpw2000_30_sec.contribution=rep(NA,times=length(agricult_gbifspp)),
-                     simplelc2000.contribution=rep(NA,times=length(agricult_gbifspp)),
-                     bio16.permutation.importance=rep(NA,times=length(agricult_gbifspp)),
-                     bio4.permutation.importance=rep(NA,times=length(agricult_gbifspp)),
-                     gpw2000_30_sec.permutation.importance=rep(NA,times=length(agricult_gbifspp)),
-                     simplelc2000.permutation.importance=rep(NA,times=length(agricult_gbifspp)))
-
-for (i in 1:length(agricult_gbifspp)){
-  maxent_agricult_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],agricult_gbif@coords[agricult_gbif$species==agricult_gbifspp[i],],a=bg_BC,
-                               factors="simplelc2000",
-                               args=c('betamultiplier=2.5',
-                                      'linear=TRUE',
-                                      'quadratic=TRUE',
-                                      'hinge=FALSE',
-                                      'threshold=FALSE',
-                                      'product=FALSE'),#Currently using tuning parameters for whole agriculture category
-                               path=paste0('MaxEntOutput/AgricSpecies/',agricult_gbifspp[i]))
-  
-  agricspp$AUC[i]<-as.data.frame(t(maxent_mal@results))$Training.AUC
-  agricspp$bio16.contribution[i]<-as.data.frame(t(maxent_agricult_gbif@results))$bio16.contribution
-  agricspp$bio4.contribution[i]<-as.data.frame(t(maxent_agricult_gbif@results))$bio4.contribution
-  agricspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_agricult_gbif@results))$gpw2000_30_sec.contribution
-  agricspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_agricult_gbif@results))$simplelc2000.contribution
-  agricspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_agricult_gbif@results))$bio16.permutation.importance
-  agricspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_agricult_gbif@results))$bio4.permutation.importance
-  agricspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_agricult_gbif@results))$gpw2000_30_sec.permutation.importance
-  agricspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_agricult_gbif@results))$simplelc2000.permutation.importance
-}
-head(agricspp)
-write.csv(agricspp,'AgricSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the healthcare spp ####---- 
-healthcare_gbifspp<-levels(droplevels(healthcare_gbif$species))
-healthcare_gbifspp<-healthcare_gbifspp[tapply(healthcare_gbif$species,droplevels(healthcare_gbif$species),length)>15]
-healthcarespp<-data.frame(species=healthcare_gbifspp,AUC=rep(NA,times=length(healthcare_gbifspp)),
-                     bio16.contribution=rep(NA,times=length(healthcare_gbifspp)),
-                     bio4.contribution=rep(NA,times=length(healthcare_gbifspp)),
-                     gpw2000_30_sec.contribution=rep(NA,times=length(healthcare_gbifspp)),
-                     simplelc2000.contribution=rep(NA,times=length(healthcare_gbifspp)),
-                     bio16.permutation.importance=rep(NA,times=length(healthcare_gbifspp)),
-                     bio4.permutation.importance=rep(NA,times=length(healthcare_gbifspp)),
-                     gpw2000_30_sec.permutation.importance=rep(NA,times=length(healthcare_gbifspp)),
-                     simplelc2000.permutation.importance=rep(NA,times=length(healthcare_gbifspp)))
-
-for (i in 1:length(healthcare_gbifspp)){
-  maxent_healthcare_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],healthcare_gbif@coords[healthcare_gbif$species==healthcare_gbifspp[i],],a=bg_BC,
-                               factors="simplelc2000",
-                               args=c('betamultiplier=2.5',
-                                      'linear=TRUE',
-                                      'quadratic=TRUE',
-                                      'hinge=FALSE',
-                                      'threshold=FALSE',
-                                      'product=FALSE'),#Currently using tuning parameters for whole healthcare category
-                               path=paste0('MaxEntOutput/HealthcareSpecies/',healthcare_gbifspp[i]))
-  
-  healthcarespp$AUC[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$Training.AUC
-  healthcarespp$bio16.contribution[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$bio16.contribution
-  healthcarespp$bio4.contribution[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$bio4.contribution
-  healthcarespp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$gpw2000_30_sec.contribution
-  healthcarespp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$simplelc2000.contribution
-  healthcarespp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$bio16.permutation.importance
-  healthcarespp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$bio4.permutation.importance
-  healthcarespp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$gpw2000_30_sec.permutation.importance
-  healthcarespp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_healthcare_gbif@results))$simplelc2000.permutation.importance
-}
-head(healthcarespp)
-write.csv(healthcarespp,'HealthcareSppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the purification spp ####---- 
-purif_gbifspp<-levels(droplevels(purif_gbif$species))
-purif_gbifspp<-purif_gbifspp[tapply(purif_gbif$species,droplevels(purif_gbif$species),length)>10]
-purificationspp<-data.frame(species=purif_gbifspp,AUC=rep(NA,times=length(purif_gbifspp)),
-                          bio16.contribution=rep(NA,times=length(purif_gbifspp)),
-                          bio4.contribution=rep(NA,times=length(purif_gbifspp)),
-                          gpw2000_30_sec.contribution=rep(NA,times=length(purif_gbifspp)),
-                          simplelc2000.contribution=rep(NA,times=length(purif_gbifspp)),
-                          bio16.permutation.importance=rep(NA,times=length(purif_gbifspp)),
-                          bio4.permutation.importance=rep(NA,times=length(purif_gbifspp)),
-                          gpw2000_30_sec.permutation.importance=rep(NA,times=length(purif_gbifspp)),
-                          simplelc2000.permutation.importance=rep(NA,times=length(purif_gbifspp)))
-
-for (i in 1:length(purif_gbifspp)){
-  maxent_purif_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],purif_gbif@coords[purif_gbif$species==purif_gbifspp[i],],a=bg_BC,
-                                 factors="simplelc2000",
-                                 args=c('betamultiplier=2.5',
-                                        'linear=TRUE',
-                                        'quadratic=TRUE',
-                                        'hinge=FALSE',
-                                        'threshold=FALSE',
-                                        'product=FALSE'),#Currently using tuning parameters for whole water purification category
-                                 path=paste0('MaxEntOutput/PurificationSpecies/',purif_gbifspp[i]))
-  
-  purificationspp$AUC[i]<-as.data.frame(t(maxent_purif_gbif@results))$Training.AUC
-  purificationspp$bio16.contribution[i]<-as.data.frame(t(maxent_purif_gbif@results))$bio16.contribution
-  purificationspp$bio4.contribution[i]<-as.data.frame(t(maxent_purif_gbif@results))$bio4.contribution
-  purificationspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_purif_gbif@results))$gpw2000_30_sec.contribution
-  purificationspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_purif_gbif@results))$simplelc2000.contribution
-  purificationspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_purif_gbif@results))$bio16.permutation.importance
-  purificationspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_purif_gbif@results))$bio4.permutation.importance
-  purificationspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_purif_gbif@results))$gpw2000_30_sec.permutation.importance
-  purificationspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_purif_gbif@results))$simplelc2000.permutation.importance
-}
-head(purif_gbifspp)
-write.csv(purif_gbif,'PurificationSppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the construction spp ####---- 
-construct_gbifspp<-levels(droplevels(construct_gbif$species))
-construct_gbifspp<-construct_gbifspp[tapply(construct_gbif$species,droplevels(construct_gbif$species),length)>10]
-constructionspp<-data.frame(species=construct_gbifspp,AUC=rep(NA,times=length(construct_gbifspp)),
-                            bio16.contribution=rep(NA,times=length(construct_gbifspp)),
-                            bio4.contribution=rep(NA,times=length(construct_gbifspp)),
-                            gpw2000_30_sec.contribution=rep(NA,times=length(construct_gbifspp)),
-                            simplelc2000.contribution=rep(NA,times=length(construct_gbifspp)),
-                            bio16.permutation.importance=rep(NA,times=length(construct_gbifspp)),
-                            bio4.permutation.importance=rep(NA,times=length(construct_gbifspp)),
-                            gpw2000_30_sec.permutation.importance=rep(NA,times=length(construct_gbifspp)),
-                            simplelc2000.permutation.importance=rep(NA,times=length(construct_gbifspp)))
-
-for (i in 1:length(construct_gbifspp)){
-  maxent_construct_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],construct_gbif@coords[construct_gbif$species==construct_gbifspp[i],],a=bg_BC,
-                            factors="simplelc2000",
-                            args=c('betamultiplier=2.5',
-                                   'linear=TRUE',
-                                   'quadratic=TRUE',
-                                   'hinge=FALSE',
-                                   'threshold=FALSE',
-                                   'product=FALSE'),#Currently using tuning parameters for whole construction category
-                            path=paste0('MaxEntOutput/ConstructionSpecies/',construct_gbifspp[i]))
-  
-  constructionspp$AUC[i]<-as.data.frame(t(maxent_contruct_gbif@results))$Training.AUC
-  constructionspp$bio16.contribution[i]<-as.data.frame(t(maxent_construct_gbif@results))$bio16.contribution
-  constructionspp$bio4.contribution[i]<-as.data.frame(t(maxent_construct_gbif@results))$bio4.contribution
-  constructionspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_construct_gbif@results))$gpw2000_30_sec.contribution
-  constructionspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_construct_gbif@results))$simplelc2000.contribution
-  constructionspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_construct_gbif@results))$bio16.permutation.importance
-  constructionspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_construct_gbif@results))$bio4.permutation.importance
-  constructionspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_construct_gbif@results))$gpw2000_30_sec.permutation.importance
-  constructionspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_construct_gbif@results))$simplelc2000.permutation.importance
-}
-head(construct_gbifspp)
-write.csv(construct_gbif,'ConstructionSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Social spp ####---- 
-social_gbifspp<-levels(droplevels(social_gbif$species))
-social_gbifspp<-social_gbifspp[tapply(social_gbif$species,droplevels(social_gbif$species),length)>10]
-socialspp<-data.frame(species=social_gbifspp,AUC=rep(NA,times=length(social_gbifspp)),
-                            bio16.contribution=rep(NA,times=length(social_gbifspp)),
-                            bio4.contribution=rep(NA,times=length(social_gbifspp)),
-                            gpw2000_30_sec.contribution=rep(NA,times=length(social_gbifspp)),
-                            simplelc2000.contribution=rep(NA,times=length(social_gbifspp)),
-                            bio16.permutation.importance=rep(NA,times=length(social_gbifspp)),
-                            bio4.permutation.importance=rep(NA,times=length(social_gbifspp)),
-                            gpw2000_30_sec.permutation.importance=rep(NA,times=length(social_gbifspp)),
-                            simplelc2000.permutation.importance=rep(NA,times=length(social_gbifspp)))
-
-for (i in 1:length(social_gbifspp)){
-  maxent_social_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],social_gbif@coords[social_gbif$species==social_gbifspp[i],],a=bg_BC,
-                                factors="simplelc2000",
-                                args=c('betamultiplier=2.5',
-                                       'linear=TRUE',
-                                       'quadratic=TRUE',
-                                       'hinge=FALSE',
-                                       'threshold=FALSE',
-                                       'product=FALSE'),#Currently using tuning parameters for whole social category
-                                path=paste0('MaxEntOutput/SocialSpecies/',social_gbifspp[i]))
-  
-  socialspp$AUC[i]<-as.data.frame(t(maxent_social_gbif@results))$Training.AUC
-  socialspp$bio16.contribution[i]<-as.data.frame(t(maxent_social_gbif@results))$bio16.contribution
-  socialspp$bio4.contribution[i]<-as.data.frame(t(maxent_social_gbif@results))$bio4.contribution
-  socialspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_social_gbif@results))$gpw2000_30_sec.contribution
-  socialspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_social_gbif@results))$simplelc2000.contribution
-  socialspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_social_gbif@results))$bio16.permutation.importance
-  socialspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_social_gbif@results))$bio4.permutation.importance
-  socialspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_social_gbif@results))$gpw2000_30_sec.permutation.importance
-  socialspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_social_gbif@results))$simplelc2000.permutation.importance
-}
-head(social_gbifspp)
-write.csv(social_gbif,'socialSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the energy spp ####---- 
-energy_gbifspp<-levels(droplevels(energy_gbif$species))
-energy_gbifspp<-energy_gbifspp[tapply(energy_gbif$species,droplevels(energy_gbif$species),length)>10]
-energyspp<-data.frame(species=energy_gbifspp,AUC=rep(NA,times=length(energy_gbifspp)),
-                      bio16.contribution=rep(NA,times=length(energy_gbifspp)),
-                      bio4.contribution=rep(NA,times=length(energy_gbifspp)),
-                      gpw2000_30_sec.contribution=rep(NA,times=length(energy_gbifspp)),
-                      simplelc2000.contribution=rep(NA,times=length(energy_gbifspp)),
-                      bio16.permutation.importance=rep(NA,times=length(energy_gbifspp)),
-                      bio4.permutation.importance=rep(NA,times=length(energy_gbifspp)),
-                      gpw2000_30_sec.permutation.importance=rep(NA,times=length(energy_gbifspp)),
-                      simplelc2000.permutation.importance=rep(NA,times=length(energy_gbifspp)))
-
-for (i in 1:length(energy_gbifspp)){
-  maxent_energy_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],energy_gbif@coords[energy_gbif$species==energy_gbifspp[i],],a=bg_BC,
-                             factors="simplelc2000",
-                             args=c('betamultiplier=2.5',
-                                    'linear=TRUE',
-                                    'quadratic=TRUE',
-                                    'hinge=FALSE',
-                                    'threshold=FALSE',
-                                    'product=FALSE'),#Currently using tuning parameters for whole energy category
-                             path=paste0('MaxEntOutput/energySpecies/',energy_gbifspp[i]))
-  
-  energyspp$AUC[i]<-as.data.frame(t(maxent_energy_gbif@results))$Training.AUC
-  energyspp$bio16.contribution[i]<-as.data.frame(t(maxent_energy_gbif@results))$bio16.contribution
-  energyspp$bio4.contribution[i]<-as.data.frame(t(maxent_energy_gbif@results))$bio4.contribution
-  energyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_energy_gbif@results))$gpw2000_30_sec.contribution
-  energyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_energy_gbif@results))$simplelc2000.contribution
-  energyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_energy_gbif@results))$bio16.permutation.importance
-  energyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_energy_gbif@results))$bio4.permutation.importance
-  energyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_energy_gbif@results))$gpw2000_30_sec.permutation.importance
-  energyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_energy_gbif@results))$simplelc2000.permutation.importance
-}
-head(energy_gbifspp)
-write.csv(energy_gbif,'energySppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the food and nutrition spp ####---- 
-foodnutr_gbifspp<-levels(droplevels(foodnutr_gbif$species))
-foodnutr_gbifspp<-foodnutr_gbifspp[tapply(foodnutr_gbif$species,droplevels(foodnutr_gbif$species),length)>10]
-foodnutrspp<-data.frame(species=foodnutr_gbifspp,AUC=rep(NA,times=length(foodnutr_gbifspp)),
-                      bio16.contribution=rep(NA,times=length(foodnutr_gbifspp)),
-                      bio4.contribution=rep(NA,times=length(foodnutr_gbifspp)),
-                      gpw2000_30_sec.contribution=rep(NA,times=length(foodnutr_gbifspp)),
-                      simplelc2000.contribution=rep(NA,times=length(foodnutr_gbifspp)),
-                      bio16.permutation.importance=rep(NA,times=length(foodnutr_gbifspp)),
-                      bio4.permutation.importance=rep(NA,times=length(foodnutr_gbifspp)),
-                      gpw2000_30_sec.permutation.importance=rep(NA,times=length(foodnutr_gbifspp)),
-                      simplelc2000.permutation.importance=rep(NA,times=length(foodnutr_gbifspp)))
-
-for (i in 1:length(foodnutr_gbifspp)){
-  maxent_foodnutr_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],foodnutr_gbif@coords[foodnutr_gbif$species==foodnutr_gbifspp[i],],a=bg_BC,
-                             factors="simplelc2000",
-                             args=c('betamultiplier=2.5',
-                                    'linear=TRUE',
-                                    'quadratic=TRUE',
-                                    'hinge=FALSE',
-                                    'threshold=FALSE',
-                                    'product=FALSE'),#Currently using tuning parameters for whole foodnutr category
-                             path=paste0('MaxEntOutput/foodnutrSpecies/',foodnutr_gbifspp[i]))
-  
-  foodnutrspp$AUC[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$Training.AUC
-  foodnutrspp$bio16.contribution[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$bio16.contribution
-  foodnutrspp$bio4.contribution[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$bio4.contribution
-  foodnutrspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$gpw2000_30_sec.contribution
-  foodnutrspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$simplelc2000.contribution
-  foodnutrspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$bio16.permutation.importance
-  foodnutrspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$bio4.permutation.importance
-  foodnutrspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$gpw2000_30_sec.permutation.importance
-  foodnutrspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_foodnutr_gbif@results))$simplelc2000.permutation.importance
-}
-head(foodnutr_gbifspp)
-write.csv(foodnutr_gbif,'foodnutrSppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the culture spp ####---- 
-cultur_gbifspp<-levels(droplevels(cultur_gbif$species))
-cultur_gbifspp<-cultur_gbifspp[tapply(cultur_gbif$species,droplevels(cultur_gbif$species),length)>10]
-culturspp<-data.frame(species=cultur_gbifspp,AUC=rep(NA,times=length(cultur_gbifspp)),
-                        bio16.contribution=rep(NA,times=length(cultur_gbifspp)),
-                        bio4.contribution=rep(NA,times=length(cultur_gbifspp)),
-                        gpw2000_30_sec.contribution=rep(NA,times=length(cultur_gbifspp)),
-                        simplelc2000.contribution=rep(NA,times=length(cultur_gbifspp)),
-                        bio16.permutation.importance=rep(NA,times=length(cultur_gbifspp)),
-                        bio4.permutation.importance=rep(NA,times=length(cultur_gbifspp)),
-                        gpw2000_30_sec.permutation.importance=rep(NA,times=length(cultur_gbifspp)),
-                        simplelc2000.permutation.importance=rep(NA,times=length(cultur_gbifspp)))
-
-for (i in 1:length(cultur_gbifspp)){
-  maxent_cultur_gbif<-maxent(ghana_envvars[[c(4,16,20,29)]],cultur_gbif@coords[cultur_gbif$species==cultur_gbifspp[i],],a=bg_BC,
-                               factors="simplelc2000",
-                               args=c('betamultiplier=2.5',
-                                      'linear=TRUE',
-                                      'quadratic=TRUE',
-                                      'hinge=FALSE',
-                                      'threshold=FALSE',
-                                      'product=FALSE'),#Currently using tuning parameters for whole cultur category
-                               path=paste0('MaxEntOutput/culturSpecies/',cultur_gbifspp[i]))
-  
-  culturspp$AUC[i]<-as.data.frame(t(maxent_cultur_gbif@results))$Training.AUC
-  culturspp$bio16.contribution[i]<-as.data.frame(t(maxent_cultur_gbif@results))$bio16.contribution
-  culturspp$bio4.contribution[i]<-as.data.frame(t(maxent_cultur_gbif@results))$bio4.contribution
-  culturspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_cultur_gbif@results))$gpw2000_30_sec.contribution
-  culturspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_cultur_gbif@results))$simplelc2000.contribution
-  culturspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_cultur_gbif@results))$bio16.permutation.importance
-  culturspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_cultur_gbif@results))$bio4.permutation.importance
-  culturspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_cultur_gbif@results))$gpw2000_30_sec.permutation.importance
-  culturspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_cultur_gbif@results))$simplelc2000.permutation.importance
-}
-head(cultur_gbifspp)
-write.csv(cultur_gbif,'culturSppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the anaesthetics spp ####---- 
-anaesthspp<-levels(droplevels(anaesth$species))
-anaesthspp<-anaesthspp[tapply(anaesth$species,droplevels(anaesth$species),length)>15]
-anaestheticspp<-data.frame(species=anaesthspp,AUC=rep(NA,times=length(anaesthspp)),
-                       bio16.contribution=rep(NA,times=length(anaesthspp)),
-                       bio4.contribution=rep(NA,times=length(anaesthspp)),
-                       gpw2000_30_sec.contribution=rep(NA,times=length(anaesthspp)),
-                       simplelc2000.contribution=rep(NA,times=length(anaesthspp)),
-                       bio16.permutation.importance=rep(NA,times=length(anaesthspp)),
-                       bio4.permutation.importance=rep(NA,times=length(anaesthspp)),
-                       gpw2000_30_sec.permutation.importance=rep(NA,times=length(anaesthspp)),
-                       simplelc2000.permutation.importance=rep(NA,times=length(anaesthspp)))
-
-for (i in 1:length(anaesthspp)){
-  maxent_anaesth<-maxent(ghana_envvars[[c(4,16,20,29)]],anaesth@coords[anaesth$species==anaesthspp[i],],a=bg_BC,
-                     factors="simplelc2000",
-                     args=c('betamultiplier=2.5',
-                            'linear=TRUE',
-                            'quadratic=TRUE',
-                            'hinge=FALSE',
-                            'threshold=FALSE',
-                            'product=FALSE'),#Currently using tuning parameters for whole anaesthetics category
-                     path=paste0('MaxEntOutput/anaesthethicsSpecies/',anaesthspp[i]))
-  
-  anaestheticspp$AUC[i]<-as.data.frame(t(maxent_anaesth@results))$Training.AUC
-  anaestheticspp$bio16.contribution[i]<-as.data.frame(t(maxent_anaesth@results))$bio16.contribution
-  anaestheticspp$bio4.contribution[i]<-as.data.frame(t(maxent_anaesth@results))$bio4.contribution
-  anaestheticspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_anaesth@results))$gpw2000_30_sec.contribution
-  anaestheticspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_anaesth@results))$simplelc2000.contribution
-  anaestheticspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_anaesth@results))$bio16.permutation.importance
-  anaestheticspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_anaesth@results))$bio4.permutation.importance
-  anaestheticspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_anaesth@results))$gpw2000_30_sec.permutation.importance
-  anaestheticspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_anaesth@results))$simplelc2000.permutation.importance
-}
-head(anaestheticspp)
-write.csv(anaestheticspp,'anaestheticSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Dentistry spp ####---- 
-dentspp<-levels(droplevels(dent$species))
-dentspp<-dentspp[tapply(dent$species,droplevels(dent$species),length)>15]
-dentistryspp<-data.frame(species=dentspp,AUC=rep(NA,times=length(dentspp)),
-                           bio16.contribution=rep(NA,times=length(dentspp)),
-                           bio4.contribution=rep(NA,times=length(dentspp)),
-                           gpw2000_30_sec.contribution=rep(NA,times=length(dentspp)),
-                           simplelc2000.contribution=rep(NA,times=length(dentspp)),
-                           bio16.permutation.importance=rep(NA,times=length(dentspp)),
-                           bio4.permutation.importance=rep(NA,times=length(dentspp)),
-                           gpw2000_30_sec.permutation.importance=rep(NA,times=length(dentspp)),
-                           simplelc2000.permutation.importance=rep(NA,times=length(dentspp)))
-
-for (i in 1:length(dentspp)){
-  maxent_dent<-maxent(ghana_envvars[[c(4,16,20,29)]],dent@coords[dent$species==dentspp[i],],a=bg_BC,
-                         factors="simplelc2000",
-                         args=c('betamultiplier=2.5',
-                                'linear=TRUE',
-                                'quadratic=TRUE',
-                                'hinge=FALSE',
-                                'threshold=FALSE',
-                                'product=FALSE'),#Currently using tuning parameters for whole dentistry category
-                         path=paste0('MaxEntOutput/dentistrySpecies/',dentspp[i]))
-  
-  dentistryspp$AUC[i]<-as.data.frame(t(maxent_dent@results))$Training.AUC
-  dentistryspp$bio16.contribution[i]<-as.data.frame(t(maxent_dent@results))$bio16.contribution
-  dentistryspp$bio4.contribution[i]<-as.data.frame(t(maxent_dent@results))$bio4.contribution
-  dentistryspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_dent@results))$gpw2000_30_sec.contribution
-  dentistryspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_dent@results))$simplelc2000.contribution
-  dentistryspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_dent@results))$bio16.permutation.importance
-  dentistryspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_dent@results))$bio4.permutation.importance
-  dentistryspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_dent@results))$gpw2000_30_sec.permutation.importance
-  dentistryspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_dent@results))$simplelc2000.permutation.importance
-}
-head(dentistryspp)
-write.csv(dentistryspp,'dentistrySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Dermatology spp ####---- 
-dermspp<-levels(droplevels(derm$species))
-dermspp<-dermspp[tapply(derm$species,droplevels(derm$species),length)>15]
-dermatologyspp<-data.frame(species=dermspp,AUC=rep(NA,times=length(dermspp)),
-                         bio16.contribution=rep(NA,times=length(dermspp)),
-                         bio4.contribution=rep(NA,times=length(dermspp)),
-                         gpw2000_30_sec.contribution=rep(NA,times=length(dermspp)),
-                         simplelc2000.contribution=rep(NA,times=length(dermspp)),
-                         bio16.permutation.importance=rep(NA,times=length(dermspp)),
-                         bio4.permutation.importance=rep(NA,times=length(dermspp)),
-                         gpw2000_30_sec.permutation.importance=rep(NA,times=length(dermspp)),
-                         simplelc2000.permutation.importance=rep(NA,times=length(dermspp)))
-
-for (i in 1:length(dermspp)){
-  maxent_derm<-maxent(ghana_envvars[[c(4,16,20,29)]],derm@coords[derm$species==dermspp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole dermatology category
-                      path=paste0('MaxEntOutput/dermatologySpecies/',dermspp[i]))
-  
-  dermatologyspp$AUC[i]<-as.data.frame(t(maxent_derm@results))$Training.AUC
-  dermatologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_derm@results))$bio16.contribution
-  dermatologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_derm@results))$bio4.contribution
-  dermatologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_derm@results))$gpw2000_30_sec.contribution
-  dermatologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_derm@results))$simplelc2000.contribution
-  dermatologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_derm@results))$bio16.permutation.importance
-  dermatologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_derm@results))$bio4.permutation.importance
-  dermatologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_derm@results))$gpw2000_30_sec.permutation.importance
-  dermatologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_derm@results))$simplelc2000.permutation.importance
-}
-head(dermatologyspp)
-write.csv(dermatologyspp,'dermatologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Endocrinology spp ####---- 
-endospp<-levels(droplevels(endo$species))
-endospp<-endospp[tapply(endo$species,droplevels(endo$species),length)>15]
-endocrinologyspp<-data.frame(species=endospp,AUC=rep(NA,times=length(endospp)),
-                           bio16.contribution=rep(NA,times=length(endospp)),
-                           bio4.contribution=rep(NA,times=length(endospp)),
-                           gpw2000_30_sec.contribution=rep(NA,times=length(endospp)),
-                           simplelc2000.contribution=rep(NA,times=length(endospp)),
-                           bio16.permutation.importance=rep(NA,times=length(endospp)),
-                           bio4.permutation.importance=rep(NA,times=length(endospp)),
-                           gpw2000_30_sec.permutation.importance=rep(NA,times=length(endospp)),
-                           simplelc2000.permutation.importance=rep(NA,times=length(endospp)))
-
-for (i in 1:length(endospp)){
-  maxent_endo<-maxent(ghana_envvars[[c(4,16,20,29)]],endo@coords[endo$species==endospp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole endocrinology category
-                      path=paste0('MaxEntOutput/EndocrinologySpecies/',endospp[i]))
-  
-  endocrinologyspp$AUC[i]<-as.data.frame(t(maxent_endo@results))$Training.AUC
-  endocrinologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_endo@results))$bio16.contribution
-  endocrinologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_endo@results))$bio4.contribution
-  endocrinologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_endo@results))$gpw2000_30_sec.contribution
-  endocrinologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_endo@results))$simplelc2000.contribution
-  endocrinologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_endo@results))$bio16.permutation.importance
-  endocrinologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_endo@results))$bio4.permutation.importance
-  endocrinologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_endo@results))$gpw2000_30_sec.permutation.importance
-  endocrinologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_endo@results))$simplelc2000.permutation.importance
-}
-head(endocrinologyspp)
-write.csv(endocrinologyspp,'endocrinologySppMaxEntOutput.csv')
-
-
-#MaxEnt models for each of the Excipients spp ####---- 
-excispp<-levels(droplevels(exci$species))
-excispp<-excispp[tapply(exci$species,droplevels(exci$species),length)>15]
-excipientspp<-data.frame(species=excispp,AUC=rep(NA,times=length(excispp)),
-                             bio16.contribution=rep(NA,times=length(excispp)),
-                             bio4.contribution=rep(NA,times=length(excispp)),
-                             gpw2000_30_sec.contribution=rep(NA,times=length(excispp)),
-                             simplelc2000.contribution=rep(NA,times=length(excispp)),
-                             bio16.permutation.importance=rep(NA,times=length(excispp)),
-                             bio4.permutation.importance=rep(NA,times=length(excispp)),
-                             gpw2000_30_sec.permutation.importance=rep(NA,times=length(excispp)),
-                             simplelc2000.permutation.importance=rep(NA,times=length(excispp)))
-
-for (i in 1:length(excispp)){
-  maxent_exci<-maxent(ghana_envvars[[c(4,16,20,29)]],exci@coords[exci$species==excispp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole excipients category
-                      path=paste0('MaxEntOutput/ExcipientSpecies/',excispp[i]))
-  
-  excipientspp$AUC[i]<-as.data.frame(t(maxent_exci@results))$Training.AUC
-  excipientspp$bio16.contribution[i]<-as.data.frame(t(maxent_exci@results))$bio16.contribution
-  excipientspp$bio4.contribution[i]<-as.data.frame(t(maxent_exci@results))$bio4.contribution
-  excipientspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_exci@results))$gpw2000_30_sec.contribution
-  excipientspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_exci@results))$simplelc2000.contribution
-  excipientspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_exci@results))$bio16.permutation.importance
-  excipientspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_exci@results))$bio4.permutation.importance
-  excipientspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_exci@results))$gpw2000_30_sec.permutation.importance
-  excipientspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_exci@results))$simplelc2000.permutation.importance
-}
-head(excipientspp)
-write.csv(excipientspp,'excipientSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Fever spp ####---- 
-fevspp<-levels(droplevels(fev$species))
-fevspp<-fevspp[tapply(fev$species,droplevels(fev$species),length)>15]
-feverspp<-data.frame(species=fevspp,AUC=rep(NA,times=length(fevspp)),
-                         bio16.contribution=rep(NA,times=length(fevspp)),
-                         bio4.contribution=rep(NA,times=length(fevspp)),
-                         gpw2000_30_sec.contribution=rep(NA,times=length(fevspp)),
-                         simplelc2000.contribution=rep(NA,times=length(fevspp)),
-                         bio16.permutation.importance=rep(NA,times=length(fevspp)),
-                         bio4.permutation.importance=rep(NA,times=length(fevspp)),
-                         gpw2000_30_sec.permutation.importance=rep(NA,times=length(fevspp)),
-                         simplelc2000.permutation.importance=rep(NA,times=length(fevspp)))
-
-for (i in 1:length(fevspp)){
-  maxent_fev<-maxent(ghana_envvars[[c(4,16,20,29)]],fev@coords[fev$species==fevspp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole fev category
-                      path=paste0('MaxEntOutput/FeverSpecies/',fevspp[i]))
-  
-  feverspp$AUC[i]<-as.data.frame(t(maxent_fev@results))$Training.AUC
-  feverspp$bio16.contribution[i]<-as.data.frame(t(maxent_fev@results))$bio16.contribution
-  feverspp$bio4.contribution[i]<-as.data.frame(t(maxent_fev@results))$bio4.contribution
-  feverspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_fev@results))$gpw2000_30_sec.contribution
-  feverspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_fev@results))$simplelc2000.contribution
-  feverspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_fev@results))$bio16.permutation.importance
-  feverspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_fev@results))$bio4.permutation.importance
-  feverspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_fev@results))$gpw2000_30_sec.permutation.importance
-  feverspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_fev@results))$simplelc2000.permutation.importance
-}
-head(feverspp)
-write.csv(feverspp,'feverSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Immunology spp ####---- 
-immuspp<-levels(droplevels(immu$species))
-immuspp<-immuspp[tapply(immu$species,droplevels(immu$species),length)>15]
-immunologyspp<-data.frame(species=immuspp,AUC=rep(NA,times=length(immuspp)),
-                     bio16.contribution=rep(NA,times=length(immuspp)),
-                     bio4.contribution=rep(NA,times=length(immuspp)),
-                     gpw2000_30_sec.contribution=rep(NA,times=length(immuspp)),
-                     simplelc2000.contribution=rep(NA,times=length(immuspp)),
-                     bio16.permutation.importance=rep(NA,times=length(immuspp)),
-                     bio4.permutation.importance=rep(NA,times=length(immuspp)),
-                     gpw2000_30_sec.permutation.importance=rep(NA,times=length(immuspp)),
-                     simplelc2000.permutation.importance=rep(NA,times=length(immuspp)))
-
-for (i in 1:length(immuspp)){
-  maxent_immu<-maxent(ghana_envvars[[c(4,16,20,29)]],immu@coords[immu$species==immuspp[i],],a=bg_BC,
-                     factors="simplelc2000",
-                     args=c('betamultiplier=2.5',
-                            'linear=TRUE',
-                            'quadratic=TRUE',
-                            'hinge=FALSE',
-                            'threshold=FALSE',
-                            'product=FALSE'),#Currently using tuning parameters for whole Immunology category
-                     path=paste0('MaxEntOutput/immunologySpecies/',immuspp[i]))
-  
-  immunologyspp$AUC[i]<-as.data.frame(t(maxent_immu@results))$Training.AUC
-  immunologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_immu@results))$bio16.contribution
-  immunologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_immu@results))$bio4.contribution
-  immunologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_immu@results))$gpw2000_30_sec.contribution
-  immunologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_immu@results))$simplelc2000.contribution
-  immunologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_immu@results))$bio16.permutation.importance
-  immunologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_immu@results))$bio4.permutation.importance
-  immunologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_immu@results))$gpw2000_30_sec.permutation.importance
-  immunologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_immu@results))$simplelc2000.permutation.importance
-}
-head(immunologyspp)
-write.csv(immunologyspp,'immunologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Infertility spp ####---- 
-inferspp<-levels(droplevels(infer$species))
-inferspp<-inferspp[tapply(infer$species,droplevels(infer$species),length)>15]
-infertilityspp<-data.frame(species=inferspp,AUC=rep(NA,times=length(inferspp)),
-                          bio16.contribution=rep(NA,times=length(inferspp)),
-                          bio4.contribution=rep(NA,times=length(inferspp)),
-                          gpw2000_30_sec.contribution=rep(NA,times=length(inferspp)),
-                          simplelc2000.contribution=rep(NA,times=length(inferspp)),
-                          bio16.permutation.importance=rep(NA,times=length(inferspp)),
-                          bio4.permutation.importance=rep(NA,times=length(inferspp)),
-                          gpw2000_30_sec.permutation.importance=rep(NA,times=length(inferspp)),
-                          simplelc2000.permutation.importance=rep(NA,times=length(inferspp)))
-
-for (i in 1:length(inferspp)){
-  maxent_infer<-maxent(ghana_envvars[[c(4,16,20,29)]],infer@coords[infer$species==inferspp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole infertility category
-                      path=paste0('MaxEntOutput/infertilitySpecies/',inferspp[i]))
-  
-  infertilityspp$AUC[i]<-as.data.frame(t(maxent_infer@results))$Training.AUC
-  infertilityspp$bio16.contribution[i]<-as.data.frame(t(maxent_infer@results))$bio16.contribution
-  infertilityspp$bio4.contribution[i]<-as.data.frame(t(maxent_infer@results))$bio4.contribution
-  infertilityspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_infer@results))$gpw2000_30_sec.contribution
-  infertilityspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_infer@results))$simplelc2000.contribution
-  infertilityspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_infer@results))$bio16.permutation.importance
-  infertilityspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_infer@results))$bio4.permutation.importance
-  infertilityspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_infer@results))$gpw2000_30_sec.permutation.importance
-  infertilityspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_infer@results))$simplelc2000.permutation.importance
-}
-head(infertilityspp)
-write.csv(infertilityspp,'infertilitySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Musculoskeletal and cardiology spp ####---- 
-muscarspp<-levels(droplevels(muscar$species))
-muscarspp<-muscarspp[tapply(muscar$species,droplevels(muscar$species),length)>15]
-muscardiologyspp<-data.frame(species=muscarspp,AUC=rep(NA,times=length(muscarspp)),
-                           bio16.contribution=rep(NA,times=length(muscarspp)),
-                           bio4.contribution=rep(NA,times=length(muscarspp)),
-                           gpw2000_30_sec.contribution=rep(NA,times=length(muscarspp)),
-                           simplelc2000.contribution=rep(NA,times=length(muscarspp)),
-                           bio16.permutation.importance=rep(NA,times=length(muscarspp)),
-                           bio4.permutation.importance=rep(NA,times=length(muscarspp)),
-                           gpw2000_30_sec.permutation.importance=rep(NA,times=length(muscarspp)),
-                           simplelc2000.permutation.importance=rep(NA,times=length(muscarspp)))
-
-for (i in 1:length(muscarspp)){
-  maxent_muscar<-maxent(ghana_envvars[[c(4,16,20,29)]],muscar@coords[muscar$species==muscarspp[i],],a=bg_BC,
-                       factors="simplelc2000",
-                       args=c('betamultiplier=2.5',
-                              'linear=TRUE',
-                              'quadratic=TRUE',
-                              'hinge=FALSE',
-                              'threshold=FALSE',
-                              'product=FALSE'),#Currently using tuning parameters for whole muscardiology category
-                       path=paste0('MaxEntOutput/muscardiologySpecies/',muscarspp[i]))
-  
-  muscardiologyspp$AUC[i]<-as.data.frame(t(maxent_muscar@results))$Training.AUC
-  muscardiologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_muscar@results))$bio16.contribution
-  muscardiologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_muscar@results))$bio4.contribution
-  muscardiologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_muscar@results))$gpw2000_30_sec.contribution
-  muscardiologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_muscar@results))$simplelc2000.contribution
-  muscardiologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_muscar@results))$bio16.permutation.importance
-  muscardiologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_muscar@results))$bio4.permutation.importance
-  muscardiologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_muscar@results))$gpw2000_30_sec.permutation.importance
-  muscardiologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_muscar@results))$simplelc2000.permutation.importance
-}
-head(muscardiologyspp)
-write.csv(muscardiologyspp,'muscardiologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the neurology spp ####---- 
-neurospp<-levels(droplevels(neuro$species))
-neurospp<-neurospp[tapply(neuro$species,droplevels(neuro$species),length)>15]
-neurologyspp<-data.frame(species=neurospp,AUC=rep(NA,times=length(neurospp)),
-                             bio16.contribution=rep(NA,times=length(neurospp)),
-                             bio4.contribution=rep(NA,times=length(neurospp)),
-                             gpw2000_30_sec.contribution=rep(NA,times=length(neurospp)),
-                             simplelc2000.contribution=rep(NA,times=length(neurospp)),
-                             bio16.permutation.importance=rep(NA,times=length(neurospp)),
-                             bio4.permutation.importance=rep(NA,times=length(neurospp)),
-                             gpw2000_30_sec.permutation.importance=rep(NA,times=length(neurospp)),
-                             simplelc2000.permutation.importance=rep(NA,times=length(neurospp)))
-
-for (i in 1:length(neurospp)){
-  maxent_neuro<-maxent(ghana_envvars[[c(4,16,20,29)]],neuro@coords[neuro$species==neurospp[i],],a=bg_BC,
-                        factors="simplelc2000",
-                        args=c('betamultiplier=2.5',
-                               'linear=TRUE',
-                               'quadratic=TRUE',
-                               'hinge=FALSE',
-                               'threshold=FALSE',
-                               'product=FALSE'),#Currently using tuning parameters for whole neurology category
-                        path=paste0('MaxEntOutput/neurologySpecies/',neurospp[i]))
-  
-  neurologyspp$AUC[i]<-as.data.frame(t(maxent_neuro@results))$Training.AUC
-  neurologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_neuro@results))$bio16.contribution
-  neurologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_neuro@results))$bio4.contribution
-  neurologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_neuro@results))$gpw2000_30_sec.contribution
-  neurologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_neuro@results))$simplelc2000.contribution
-  neurologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_neuro@results))$bio16.permutation.importance
-  neurologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_neuro@results))$bio4.permutation.importance
-  neurologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_neuro@results))$gpw2000_30_sec.permutation.importance
-  neurologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_neuro@results))$simplelc2000.permutation.importance
-}
-head(neurologyspp)
-write.csv(neurologyspp,'neurologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the oncology spp ####---- 
-oncospp<-levels(droplevels(onco$species))
-oncospp<-oncospp[tapply(onco$species,droplevels(onco$species),length)>15]
-oncologyspp<-data.frame(species=oncospp,AUC=rep(NA,times=length(oncospp)),
-                         bio16.contribution=rep(NA,times=length(oncospp)),
-                         bio4.contribution=rep(NA,times=length(oncospp)),
-                         gpw2000_30_sec.contribution=rep(NA,times=length(oncospp)),
-                         simplelc2000.contribution=rep(NA,times=length(oncospp)),
-                         bio16.permutation.importance=rep(NA,times=length(oncospp)),
-                         bio4.permutation.importance=rep(NA,times=length(oncospp)),
-                         gpw2000_30_sec.permutation.importance=rep(NA,times=length(oncospp)),
-                         simplelc2000.permutation.importance=rep(NA,times=length(oncospp)))
-
-for (i in 1:length(oncospp)){
-  maxent_onco<-maxent(ghana_envvars[[c(4,16,20,29)]],onco@coords[onco$species==oncospp[i],],a=bg_BC,
-                       factors="simplelc2000",
-                       args=c('betamultiplier=2.5',
-                              'linear=TRUE',
-                              'quadratic=TRUE',
-                              'hinge=FALSE',
-                              'threshold=FALSE',
-                              'product=FALSE'),#Currently using tuning parameters for whole oncology category
-                       path=paste0('MaxEntOutput/oncologySpecies/',oncospp[i]))
-  
-  oncologyspp$AUC[i]<-as.data.frame(t(maxent_onco@results))$Training.AUC
-  oncologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_onco@results))$bio16.contribution
-  oncologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_onco@results))$bio4.contribution
-  oncologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_onco@results))$gpw2000_30_sec.contribution
-  oncologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_onco@results))$simplelc2000.contribution
-  oncologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_onco@results))$bio16.permutation.importance
-  oncologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_onco@results))$bio4.permutation.importance
-  oncologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_onco@results))$gpw2000_30_sec.permutation.importance
-  oncologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_onco@results))$simplelc2000.permutation.importance
-}
-head(oncologyspp)
-write.csv(oncologyspp,'oncologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the ophthalmology spp ####---- 
-ophtspp<-levels(droplevels(opht$species))
-ophtspp<-ophtspp[tapply(opht$species,droplevels(opht$species),length)>15]
-ophthalmologyspp<-data.frame(species=ophtspp,AUC=rep(NA,times=length(ophtspp)),
-                        bio16.contribution=rep(NA,times=length(ophtspp)),
-                        bio4.contribution=rep(NA,times=length(ophtspp)),
-                        gpw2000_30_sec.contribution=rep(NA,times=length(ophtspp)),
-                        simplelc2000.contribution=rep(NA,times=length(ophtspp)),
-                        bio16.permutation.importance=rep(NA,times=length(ophtspp)),
-                        bio4.permutation.importance=rep(NA,times=length(ophtspp)),
-                        gpw2000_30_sec.permutation.importance=rep(NA,times=length(ophtspp)),
-                        simplelc2000.permutation.importance=rep(NA,times=length(ophtspp)))
-
-for (i in 1:length(ophtspp)){
-  maxent_opht<-maxent(ghana_envvars[[c(4,16,20,29)]],opht@coords[opht$species==ophtspp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole ophthalmology category
-                      path=paste0('MaxEntOutput/ophthalmologySpecies/',ophtspp[i]))
-  
-  ophthalmologyspp$AUC[i]<-as.data.frame(t(maxent_opht@results))$Training.AUC
-  ophthalmologyspp$bio16.contribution[i]<-as.data.frame(t(maxent_opht@results))$bio16.contribution
-  ophthalmologyspp$bio4.contribution[i]<-as.data.frame(t(maxent_opht@results))$bio4.contribution
-  ophthalmologyspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_opht@results))$gpw2000_30_sec.contribution
-  ophthalmologyspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_opht@results))$simplelc2000.contribution
-  ophthalmologyspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_opht@results))$bio16.permutation.importance
-  ophthalmologyspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_opht@results))$bio4.permutation.importance
-  ophthalmologyspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_opht@results))$gpw2000_30_sec.permutation.importance
-  ophthalmologyspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_opht@results))$simplelc2000.permutation.importance
-}
-head(ophthalmologyspp)
-write.csv(ophthalmologyspp,'ophthalmologySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Orthopaedics spp ####---- 
-orthospp<-levels(droplevels(ortho$species))
-orthospp<-orthospp[tapply(ortho$species,droplevels(ortho$species),length)>15]
-orthopaedicsspp<-data.frame(species=orthospp,AUC=rep(NA,times=length(orthospp)),
-                            bio16.contribution=rep(NA,times=length(orthospp)),
-                            bio4.contribution=rep(NA,times=length(orthospp)),
-                            gpw2000_30_sec.contribution=rep(NA,times=length(orthospp)),
-                            simplelc2000.contribution=rep(NA,times=length(orthospp)),
-                            bio16.permutation.importance=rep(NA,times=length(orthospp)),
-                            bio4.permutation.importance=rep(NA,times=length(orthospp)),
-                            gpw2000_30_sec.permutation.importance=rep(NA,times=length(orthospp)),
-                            simplelc2000.permutation.importance=rep(NA,times=length(orthospp)))
-
-for (i in 1:length(orthospp)){
-  maxent_ortho<-maxent(ghana_envvars[[c(4,16,20,29)]],ortho@coords[ortho$species==orthospp[i],],a=bg_BC,
-                       factors="simplelc2000",
-                       args=c('betamultiplier=2.5',
-                              'linear=TRUE',
-                              'quadratic=TRUE',
-                              'hinge=FALSE',
-                              'threshold=FALSE',
-                              'product=FALSE'),#Currently using tuning parameters for whole orthopaedics category
-                       path=paste0('MaxEntOutput/orthopaedicsSpecies/',orthospp[i]))
-  
-  orthopaedicsspp$AUC[i]<-as.data.frame(t(maxent_ortho@results))$Training.AUC
-  orthopaedicsspp$bio16.contribution[i]<-as.data.frame(t(maxent_ortho@results))$bio16.contribution
-  orthopaedicsspp$bio4.contribution[i]<-as.data.frame(t(maxent_ortho@results))$bio4.contribution
-  orthopaedicsspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_ortho@results))$gpw2000_30_sec.contribution
-  orthopaedicsspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_ortho@results))$simplelc2000.contribution
-  orthopaedicsspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_ortho@results))$bio16.permutation.importance
-  orthopaedicsspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_ortho@results))$bio4.permutation.importance
-  orthopaedicsspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_ortho@results))$gpw2000_30_sec.permutation.importance
-  orthopaedicsspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_ortho@results))$simplelc2000.permutation.importance
-}
-head(orthopaedicsspp)
-write.csv(orthopaedicsspp,'orthopaedicsSppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Psychiatry spp ####---- 
-psycspp<-levels(droplevels(psyc$species))
-psycspp<-psycspp[tapply(psyc$species,droplevels(psyc$species),length)>15]
-psychiatryspp<-data.frame(species=psycspp,AUC=rep(NA,times=length(psycspp)),
-                            bio16.contribution=rep(NA,times=length(psycspp)),
-                            bio4.contribution=rep(NA,times=length(psycspp)),
-                            gpw2000_30_sec.contribution=rep(NA,times=length(psycspp)),
-                            simplelc2000.contribution=rep(NA,times=length(psycspp)),
-                            bio16.permutation.importance=rep(NA,times=length(psycspp)),
-                            bio4.permutation.importance=rep(NA,times=length(psycspp)),
-                            gpw2000_30_sec.permutation.importance=rep(NA,times=length(psycspp)),
-                            simplelc2000.permutation.importance=rep(NA,times=length(psycspp)))
-
-for (i in 1:length(psycspp)){
-  maxent_psyc<-maxent(ghana_envvars[[c(4,16,20,29)]],psyc@coords[psyc$species==psycspp[i],],a=bg_BC,
-                       factors="simplelc2000",
-                       args=c('betamultiplier=2.5',
-                              'linear=TRUE',
-                              'quadratic=TRUE',
-                              'hinge=FALSE',
-                              'threshold=FALSE',
-                              'product=FALSE'),#Currently using tuning parameters for whole psychiatry category
-                       path=paste0('MaxEntOutput/psychiatrySpecies/',psycspp[i]))
-  
-  psychiatryspp$AUC[i]<-as.data.frame(t(maxent_psyc@results))$Training.AUC
-  psychiatryspp$bio16.contribution[i]<-as.data.frame(t(maxent_psyc@results))$bio16.contribution
-  psychiatryspp$bio4.contribution[i]<-as.data.frame(t(maxent_psyc@results))$bio4.contribution
-  psychiatryspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_psyc@results))$gpw2000_30_sec.contribution
-  psychiatryspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_psyc@results))$simplelc2000.contribution
-  psychiatryspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_psyc@results))$bio16.permutation.importance
-  psychiatryspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_psyc@results))$bio4.permutation.importance
-  psychiatryspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_psyc@results))$gpw2000_30_sec.permutation.importance
-  psychiatryspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_psyc@results))$simplelc2000.permutation.importance
-}
-head(psychiatryspp)
-write.csv(psychiatryspp,'psychiatrySppMaxEntOutput.csv')
-
-#MaxEnt models for each of the Obstetrics spp ####---- 
-obsspp<-levels(droplevels(obs$species))
-obsspp<-obsspp[tapply(obs$species,droplevels(obs$species),length)>15]
-obstetricsspp<-data.frame(species=obsspp,AUC=rep(NA,times=length(obsspp)),
-                          bio16.contribution=rep(NA,times=length(obsspp)),
-                          bio4.contribution=rep(NA,times=length(obsspp)),
-                          gpw2000_30_sec.contribution=rep(NA,times=length(obsspp)),
-                          simplelc2000.contribution=rep(NA,times=length(obsspp)),
-                          bio16.permutation.importance=rep(NA,times=length(obsspp)),
-                          bio4.permutation.importance=rep(NA,times=length(obsspp)),
-                          gpw2000_30_sec.permutation.importance=rep(NA,times=length(obsspp)),
-                          simplelc2000.permutation.importance=rep(NA,times=length(obsspp)))
-
-for (i in 1:length(obsspp)){
-  maxent_obs<-maxent(ghana_envvars[[c(4,16,20,29)]],obs@coords[obs$species==obsspp[i],],a=bg_BC,
-                      factors="simplelc2000",
-                      args=c('betamultiplier=2.5',
-                             'linear=TRUE',
-                             'quadratic=TRUE',
-                             'hinge=FALSE',
-                             'threshold=FALSE',
-                             'product=FALSE'),#Currently using tuning parameters for whole obstetrics category
-                      path=paste0('MaxEntOutput/obstetricsSpecies/',obsspp[i]))
-  
-  obstetricsspp$AUC[i]<-as.data.frame(t(maxent_obs@results))$Training.AUC
-  obstetricsspp$bio16.contribution[i]<-as.data.frame(t(maxent_obs@results))$bio16.contribution
-  obstetricsspp$bio4.contribution[i]<-as.data.frame(t(maxent_obs@results))$bio4.contribution
-  obstetricsspp$gpw2000_30_sec.contribution[i]<-as.data.frame(t(maxent_obs@results))$gpw2000_30_sec.contribution
-  obstetricsspp$simplelc2000.contribution[i]<-as.data.frame(t(maxent_obs@results))$simplelc2000.contribution
-  obstetricsspp$bio16.permutation.importance[i]<-as.data.frame(t(maxent_obs@results))$bio16.permutation.importance
-  obstetricsspp$bio4.permutation.importance[i]<-as.data.frame(t(maxent_obs@results))$bio4.permutation.importance
-  obstetricsspp$gpw2000_30_sec.permutation.importance[i]<-as.data.frame(t(maxent_obs@results))$gpw2000_30_sec.permutation.importance
-  obstetricsspp$simplelc2000.permutation.importance[i]<-as.data.frame(t(maxent_obs@results))$simplelc2000.permutation.importance
-}
-head(obstetricsspp)
-write.csv(obstetricsspp,'obstetricsSppMaxEntOutput.csv')
 
 
 #### AUC scatter graph plots ####
