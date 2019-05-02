@@ -2744,35 +2744,67 @@ jpeg (ModImport, width=20, height=20, res=400, unit="cm")
 egg::ggarrange(EcoSerTemp,EcoSerPrecip,EcoSerPop,EcoSerLcov, ncol=2, nrow=2) #common.legend = T)
 dev.off()
 
-#Barplots of no.of species and records in Categories and healthcare groups
+####Barplots of no.of species and records in Categories and healthcare groups####
+library(ggplot2)
 Category<-read.csv('Category.csv')
 Category<- data.frame(Category=c("Agriculture", "Construction", "Culture", "Energy", "Food and nutrition", "Healthcare", "Social", "Water purification"),
                  No.of.species=c(42, 18, 13, 21, 26, 374, 24,1))
 head(Category)
-p<-ggplot(Category, aes(x=Category, y=No.of.species)) +
-  geom_bar(stat="identity")
-p
+
+p0<-ggplot(Category, aes(x=Category, y=No.of.species))
+p0<-p0+geom_bar(stat="identity")
+p0<-p0+scale_y_continuous(limits=c(0,400), expand=c(0,0))
+p0<-p0+xlab("")+ylab("Number of species")
+p0<-p0+geom_text(x=3,y=390, label="(a) Number of species per category")
+p0<-p0+theme_classic()
+p0<-p0+theme(axis.text.x = element_blank())
+p0
 
 Healthcaregroups<-read.csv('Healthcare groups.csv')
 Healthcaregroups<- data.frame(Groups=c("Anaes", "Dent", "Derm", "Endo", "Exci", "Fev", "Immu", "Infer", "Mal","Muscar", "Neuro", "Obs", "Onco", "Opht", "Ortho", "Psyc"),
                       No.of.species=c(23, 9, 148, 88, 4, 59, 43, 22, 215, 2, 28, 18, 174, 5, 22, 1))
 head(Healthcaregroups)
-p<-ggplot(Healthcaregroups, aes(x=Groups, y=No.of.species)) +
-  geom_bar(stat="identity")
-p
+p1<-ggplot(Healthcaregroups, aes(x=Groups, y=No.of.species))
+p1<-p1+geom_bar(stat="identity")
+p1<-p1+scale_y_continuous(limits=c(0,400), expand=c(0,0))
+p1<-p1+xlab("")+ylab("")
+p1<-p1+geom_text(x=5,y=390, label="(b) Number of species per group")
+p1<-p1+theme_classic()
+p1<-p1+theme(axis.text.x = element_blank())
+p1
 
 Categoryrecord<-read.csv('Category record.csv')
 Categoryrecord<- data.frame(Category=c("Agriculture", "Construction", "Culture", "Energy", "Food and nutrition", "Healthcare", "Social", "Water purification"),
                       No.of.records=c(3378, 1563, 639, 1183, 2134, 52744, 1559, 190))
 head(Categoryrecord)
-p<-ggplot(Categoryrecord, aes(x=Category, y=No.of.records)) +
-  geom_bar(stat="identity")
-p
+p2<-ggplot(Categoryrecord, aes(x=Category, y=No.of.records))
+p2<-p2+ geom_bar(stat="identity")
+p2<-p2+scale_y_continuous(limits=c(0,53000), expand=c(0,0))
+p2<-p2+xlab("Category")+ylab("Number of records")
+p2<-p2+geom_text(x=3,y=52000, label="(c) Number of records per category")
+p2<-p2+theme_classic()
+p2<-p2+theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.2))
+p2
 
 Groupsinhealthcare<-read.csv('Groups in healthcare.csv')
 Groupsinhealthcare<- data.frame(Groups=c("Anaes", "Dent", "Derm", "Endo", "Exci", "Fev", "Immu", "Infer", "Mal","Muscar", "Neuro", "Obs", "Onco", "Opht", "Ortho", "Psyc"),
                               No.of.records=c(1028, 274, 9778, 5110, 330, 3032, 1932, 1707, 11018, 88, 1596, 1169, 13393, 345, 1558, 386))
 head(Groupsinhealthcare)
-p<-ggplot(Groupsinhealthcare, aes(x=Groups, y=No.of.records)) +
-  geom_bar(stat="identity")
-p
+p3<-ggplot(Groupsinhealthcare, aes(x=Groups, y=No.of.records)) 
+p3<-p3+geom_bar(stat="identity")
+p3<-p3+scale_y_continuous(limits=c(0,53000), expand=c(0,0))
+p3<-p3+xlab("Group")+ylab("")
+p3<-p3+geom_text(x=5,y=52000, label="(d) Number of records per group")
+p3<-p3+theme_classic()
+p3<-p3+theme(axis.text.x = element_text(angle = 90,hjust=0.95,vjust=0.2))
+p3
+
+# Combine plots
+library(egg)
+egg::ggarrange(p0,p1,p2,p3, ncol=2, nrow=2)
+
+SppRec_barplots<- paste0("SppRec_barplots", "_",Sys.Date(), ".jpeg" )
+jpeg (SppRec_barplots, width=25, height=20, res=400, unit="cm")
+egg::ggarrange(p0,p1,p2,p3, ncol=2, nrow=2) 
+dev.off()
+
