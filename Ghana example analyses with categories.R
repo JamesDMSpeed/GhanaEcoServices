@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ###############HEAD
 #Ghana plants
 rm(list=ls())#Clean workspace
@@ -140,6 +139,10 @@ ghana1<-mask(ghanaC,ghanamap)
 GhanaRain<-levelplot(ghana1$bio12,margin=F,main='Annual precipitation (mm)',par.settings="RdBuTheme")
 GhanaRain<-GhanaRain+layer(sp.polygons(ghanamap))
 GhanaRain
+
+Temp<-levelplot(ghana1$bio4/100,margin=F,main='Temperature seasonality',par.settings="PuOrTheme")
+Temp<-Temp+layer(sp.polygons(ghanamap))
+Temp
 
 
 #Make a pairs plot to check for correlated variables
@@ -287,8 +290,8 @@ my.padding3 <- list(myTheme3, layout.heights = list(
     right.padding = 1) 
 ) 
 
-GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F,main='Land cover 2000',par.settings="BTCTheme")
-GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap))
+GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F, main='Land cover 2000',par.settings="BTCTheme")
+GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap)+c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
 GhanaLand2000
 
 plot(ghanalc2000_simple)
@@ -300,6 +303,14 @@ rat <- levels(r)[[1]][,1:5]
 rat$GhanaLand2000 <- c('forest', 'savanna', 'wetlands', 'agriculture', 'landscape area', 'clouds')
 rat$class <- c('1', '2', '3', '4', '5', '6')
 levels(r) <- rat
+
+GhanaLand2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2013lulc_2km.tif')
+ghanat<-spTransform(ghanamap,crs(GhanaLand2000))
+GhanaLand2000<-mask(crop(GhanaLand2000,ghanat),ghanat)
+plot(GhanaLand2000)
+levels(GhanaLand2000)
+crs(GhanaLand2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
+GhanaLand2000
 
 lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2013))
@@ -422,7 +433,7 @@ ghanapopdat<-stack('GhanaPopData')
 
 #### Combining levelplots in a single figure ####
 
-# Combine: GhanaSpp, GhanaRain, GhanaLand2013
+# Combine: Temp, GhanaRain, GhanaLand2000, pd2000
 # Packages
 library(grid)
 require(gridExtra)
@@ -430,7 +441,7 @@ require(gridExtra)
 #### Ghana maps ####
 GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
 jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
-grid.arrange(GhanaRain, GhanaLand2000, pd2000ghana2, ncol=3, nrow=1, widths=c(1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3)))
+grid.arrange(GhanaRain, Temp, GhanaLand2000, pd2000ghana2, ncol=3, nrow=1, widths=c(1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3)))
 dev.off()
 #vp = grid::viewport(width=1.5,height=2)
 
