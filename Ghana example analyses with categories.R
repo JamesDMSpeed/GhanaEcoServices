@@ -144,7 +144,6 @@ Temp<-levelplot(ghana1$bio4/100,margin=F,main='Temperature seasonality',par.sett
 Temp<-Temp+layer(sp.polygons(ghanamap))
 Temp
 
-
 #Make a pairs plot to check for correlated variables
 pairs(ghana1)#Many highly correlated varaibles as expected
 
@@ -209,6 +208,9 @@ ghanalc1975_simple[ghanalc1975_simple==78]<-5
 #6 represents clouds
 ghanalc1975_simple[ghanalc1975_simple==99]<-6
 
+# 7 other land uses
+ghanalc1975_simple[ghanalc1975_simple>7 & ghanalc1975_simple<98 ]<-7
+
 #Checking summary of simplified habitat areas
 ghanalc1975_simple@data@attributes
 ghanalc1975_simple
@@ -231,6 +233,8 @@ ghanalc2000@data@attributes[[1]][,1:5]
 
 #make a new raster, leaving out the attribute table for simplicity
 ghanalc2000_simple <- setValues(raster(ghanalc2000),ghanalc2000[])
+
+ghanalc2000_simple@data@values<-round(ghanalc2000_simple@data@values)
 
 #Simplifying habitat areas
 #1 represents forest
@@ -268,11 +272,16 @@ ghanalc2000_simple[ghanalc2000_simple==78]<-5
 #6 represents clouds
 ghanalc2000_simple[ghanalc2000_simple==99]<-6
 
+# 7 other land uses
+ghanalc2000_simple[ghanalc2000_simple>7 & ghanalc2000_simple<98 ]<-7
+
 #Checking summary of simplified habitat areas
 ghanalc2000_simple@data@attributes
+ghanalc2000_simple@data@values<-round(ghanalc2000_simple@data@values)
 ghanalc2000_simple # This is not WGS84 format
 summary(as.factor(ghanalc2000_simple))
 summary(as.factor(getValues(ghanalc2000_simple)))
+ghanalc2000_simple[ghanalc2000_simple==21]
 
 myTheme3 <- BTCTheme()
 my.padding3 <- list(myTheme3, layout.heights = list(
@@ -290,27 +299,33 @@ my.padding3 <- list(myTheme3, layout.heights = list(
     right.padding = 1) 
 ) 
 
-GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F, main='Land cover 2000',par.settings="BTCTheme")
-GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap)+c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
+#GhanaLand2000<-levelplot(ghanalc2000_simple,margin=F, main='Land cover 2000',par.settings="BTCTheme")
+#GhanaLand2000<-GhanaLand2000+layer(sp.polygons(ghanamap)+c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
+#GhanaLand2000
+
+class(ghanalc2000_simple)# raster
+str(ghanalc2000_simple)# structure # Find values
+ghanalc2000_simple@data@values<-round(ghanalc2000_simple@data@values)# Seems to be values above 6?
+
+rat <- c(1:7)
+rat<-as.data.frame(rat)
+rat$ID <- c(1:7)
+rat$landcover <- c('forest', 'savanna', 'wetlands', 'agriculture', 'landscape area', 'clouds', 'other')
+rat<-rat[2:3]
+levels(ghanalc2000_simple) <- rat
+
+# Level plots with factors
+GhanaLand2000<-levelplot(ghanalc2000_simple, col.regions=c("green4", "darkgoldenrod", "midnightblue", "indianred", "grey10", "white","grey"),
+                         main = "Land cover")
 GhanaLand2000
 
-plot(ghanalc2000_simple)
-levels(ghanalc2000_simple)
-title( main = "Land cover 2000")
-legend('r',pch=16,col=c('1','2','3','4','5','6'),c('forest','savanna','wetlands','agriculture','landcape area','cloud'))
-levels(ghanalc2000_simple)
-rat <- levels(r)[[1]][,1:5]
-rat$GhanaLand2000 <- c('forest', 'savanna', 'wetlands', 'agriculture', 'landscape area', 'clouds')
-rat$class <- c('1', '2', '3', '4', '5', '6')
-levels(r) <- rat
-
-GhanaLand2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2013lulc_2km.tif')
-ghanat<-spTransform(ghanamap,crs(GhanaLand2000))
-GhanaLand2000<-mask(crop(GhanaLand2000,ghanat),ghanat)
-plot(GhanaLand2000)
-levels(GhanaLand2000)
-crs(GhanaLand2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
-GhanaLand2000
+#GhanaLand2000<-raster('Landcover maps/west_africa_land-use_land-cover_2000_2km/swa_2013lulc_2km.tif')
+#ghanat<-spTransform(ghanamap,crs(GhanaLand2000))
+#GhanaLand2000<-mask(crop(GhanaLand2000,ghanat),ghanat)
+#plot(GhanaLand2000)
+#levels(GhanaLand2000)
+#crs(GhanaLand2000)<-"+proj=utm +north +zone=30 +ellps=WGS84"
+#GhanaLand2000
 
 lc2013<-raster('Landcover maps/west_africa_land-use_land-cover_2013_2km/swa_2013lulc_2km.tif')
 ghanat<-spTransform(ghanamap,crs(lc2013))
@@ -440,8 +455,8 @@ require(gridExtra)
 
 #### Ghana maps ####
 GhanaMAPS <- paste0("Ghana.maps", "_",Sys.Date(), ".jpeg" )
-jpeg (GhanaMAPS, width=28, height=10, res=400, unit="cm")
-grid.arrange(GhanaRain, Temp, GhanaLand2000, pd2000ghana2, ncol=3, nrow=1, widths=c(1.5,1.5,1.5), heights=c(2),layout_matrix = cbind(c(1), c(2),c(3)))
+jpeg (GhanaMAPS, width=25, height=20, res=400, unit="cm")
+grid.arrange(GhanaRain, Temp, GhanaLand2000, pd2000ghana2, ncol=2, nrow=2, widths=c(1.5,1.5), heights=c(2,2),layout_matrix = cbind(c(1,3), c(2,4)))
 dev.off()
 #vp = grid::viewport(width=1.5,height=2)
 
@@ -2818,4 +2833,3 @@ SppRec_barplots<- paste0("SppRec_barplots", "_",Sys.Date(), ".jpeg" )
 jpeg (SppRec_barplots, width=25, height=20, res=400, unit="cm")
 egg::ggarrange(p0,p1,p2,p3, ncol=2, nrow=2) 
 dev.off()
-
